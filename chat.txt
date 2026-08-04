@@ -4,10 +4,19 @@ hello - Chris
 
 HI EVEYRONE - gabriel
 
+Atharv: Hey everyone!
+
+
 ok hi fr - Matt
 
 <<<<<<< HEAD
 testing - Chris
 =======
 Hi All - Sammm
+<<<<<<< HEAD
+
+=======
 >>>>>>> bc50a0b093527c8d4d8af67cb07907fee86f2886
+
+message from matt
+>>>>>>> ee12480f561ab18ed5c42f260c8174daba927a8a
