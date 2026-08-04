@@ -6,4 +6,8 @@ HI EVEYRONE - gabriel
 
 ok hi fr - Matt
 
+<<<<<<< HEAD
 testing - Chris
+=======
+Hi All - Sammm
+>>>>>>> bc50a0b093527c8d4d8af67cb07907fee86f2886
