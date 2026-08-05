@@ -24,3 +24,12 @@ Hi All - Sammm
 
 message from matt
 >>>>>>> ee12480f561ab18ed5c42f260c8174daba927a8a
+
+In :
+
+Testing... Finally it works, hello hello :>
+FIXED an issue where Github would identify me a toaster; preventing me from syncing changes
+
+Out :
+
+yo i had this problem too but i fixed it - Gabriel
