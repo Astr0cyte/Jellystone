@@ -1,1 +1,5 @@
 Hello !
+
+Today we tested Git chat features.
+We successfully created files, committed messages,
+and pushed changes to the repository.

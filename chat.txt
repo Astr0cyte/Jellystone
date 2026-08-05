@@ -10,8 +10,12 @@ Atharv: Hey everyone!
 ok hi fr - Matt
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 testing - Chris
 =======
+=======
+Hello Gamer1 - Abbas
+>>>>>>> 6b2ccae60be77496c2bbb92cde92e50cec68ef30
 Hi All - Sammm
 <<<<<<< HEAD
 
@@ -20,5 +24,3 @@ Hi All - Sammm
 
 message from matt
 >>>>>>> ee12480f561ab18ed5c42f260c8174daba927a8a
-
-hello everyone again
