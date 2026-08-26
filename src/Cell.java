@@ -1,12 +1,15 @@
-class Cell {
+public class Cell<T> {
+
     private int x;
     private int y;
-    // tree object or lackthereof
+    private T content;
 
-    Cell() {
-
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.content = null;
     }
-    
+
     public int getX() {
         return x;
     }
@@ -21,5 +24,17 @@ class Cell {
 
     public void setY(int newY) {
         y = newY;
+    }
+
+    public T getContent() {
+        return content;
+    }
+
+    public void setContent(T content) {
+        this.content = content;
+    }
+
+    public boolean hasContent() {
+        return content != null;
     }
 }
