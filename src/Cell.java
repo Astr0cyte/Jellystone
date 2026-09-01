@@ -1,10 +1,12 @@
 class Cell {
     private int x;
     private int y;
-    // tree object or lackthereof
+    private Tree cellTree;
 
-    Cell() {
-
+    Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.cellTree = null;
     }
     
     public int getX() {
@@ -21,5 +23,20 @@ class Cell {
 
     public void setY(int newY) {
         y = newY;
+    }
+
+    public void plantTree(Tree cellTree) {
+        this.cellTree = cellTree;
+    }
+
+    public boolean hasTree() {
+        if(this.cellTree == null) {
+            return false;
+        }
+        return true;
+    }
+
+    public Tree getTree() {
+        return this.cellTree;
     }
 }
