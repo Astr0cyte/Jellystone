@@ -1,25 +1,15 @@
-public class IgnitionSource {
-    private int severity;
+public abstract class IgnitionSource {
 
-    public IgnitionSource() {
-       this(1);
-    }
+    protected double severity;
+    protected double spreadability;
 
-    public IgnitionSource(int severity) {
-        setSeverity(severity);
-    }
-
-    public int getSeverity() {
-        return this.severity;
-    }
-
-    public void setSeverity(int severity) {
-        if (severity < 1 || severity > 5) {
-            throw new IllegalArgumentException(
-                    "Severity must be between 1 and 5"
-            );
-        }
+    public IgnitionSource(
+            double severity,
+            double spreadability) {
 
         this.severity = severity;
+        this.spreadability = spreadability;
     }
+
+    public abstract void ignite(Forest forest);
 }

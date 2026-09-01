@@ -8,7 +8,7 @@ public class Forest {
     private double rainfall;
     private double aridity;
 
-    // private Wind wind;
+    private Wind wind;
 
     private Random random = new Random();
 
@@ -43,7 +43,7 @@ public class Forest {
     public Cell[][] getGrid() {
         return grid;
     }
-    /*
+
     public void setWind(Wind wind) {
         this.wind = wind;
         wind.applyWind(this);
@@ -52,7 +52,6 @@ public class Forest {
     public Wind getWind() {
         return wind;
     }
-    */
 
     public void update() {
 
@@ -119,7 +118,7 @@ public class Forest {
         double chance =
                 target.getTree().getSpreadability();
 
-        // chance += target.getWindExposure() * 0.2;
+        chance += target.getWindExposure() * 0.2;
 
         chance += aridity * 0.2;
 

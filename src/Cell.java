@@ -1,12 +1,13 @@
 class Cell {
     private int x;
     private int y;
-    private Tree cellTree;
+    private Tree tree;
+    private double windExposure;
 
     Cell(int x, int y) {
         this.x = x;
         this.y = y;
-        this.cellTree = null;
+        this.tree = null;
     }
     
     public int getX() {
@@ -25,18 +26,26 @@ class Cell {
         y = newY;
     }
 
-    public void plantTree(Tree cellTree) {
-        this.cellTree = cellTree;
+    public void plantTree(Tree tree) {
+        this.tree = tree;
     }
 
     public boolean hasTree() {
-        if(this.cellTree == null) {
+        if(this.tree == null) {
             return false;
         }
         return true;
     }
 
     public Tree getTree() {
-        return this.cellTree;
+        return this.tree;
+    }
+
+        public double getWindExposure() {
+        return windExposure;
+    }
+
+    public void setWindExposure(double windExposure) {
+        this.windExposure = windExposure;
     }
 }

@@ -1,27 +1,35 @@
-public class Tree {
-    private boolean burning;
-    private double spreadability; 
+public class Tree implements Burnable {
 
-    public Tree(double spreadability){
-        this.spreadability = spreadability; 
-        this.burning = false; 
+    private boolean burning;
+    private double spreadability;
+
+    public Tree(double spreadability) {
+        this.burning = false;
+        this.spreadability = spreadability;
+    }
+
+    @Override
+    public void ignite() {
+        burning = true;
+    }
+
+    // OVERLOADED version
+    public void ignite(double severity) {
+        if (severity >= 0.5) {
+            burning = true;
+        }
+    }
+
+    @Override
+    public boolean isBurning() {
+        return burning;
     }
 
     public double getSpreadability() {
-        return this.spreadability;
+        return spreadability;
     }
 
-    public boolean isBurning() {
-        return this.burning;
+    public void extinguish() {
+        burning = false;
     }
-
-    public void ignite() {
-        this.burning = true;
-    }
-
-    public void update(){
-        // fire spread logic can go here
-    }
-
-
 }
