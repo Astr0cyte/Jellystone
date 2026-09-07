@@ -11,6 +11,13 @@ public class Main {
 
         IgnitionSource source = new Arson(20, 30);
         source.ignite(forest);
+        try {
+            IgnitionSource lightning = new Lightning();
+            lightning.ignite(forest);
+        } 
+        catch (IllegalStateException e) {
+            System.out.println("Lightning strike missed: " + e.getMessage());
+        }
 
         JFrame window = new JFrame("Forest Fire Simulation");
 
