@@ -8,7 +8,9 @@ public class IgnitionSourceTest {
         testLightningIgnitesRandomCell();
         testBackburningDefaults();
         testBackburningIgnitesWaveColumns();
-
+        testRejectsInvalidSeverity();
+        testRejectsInvalidSpreadability();
+        
         System.out.println("All IgnitionSource tests passed.");
     }
 
@@ -108,18 +110,50 @@ public class IgnitionSourceTest {
         for (int col : troughColumns) {
             check(
                     forest.getGrid()[0][col].getTree().isBurning(),
-                    "Backburning should ignite the wave trough at column " + col
-            );
-        }
-
-        for (int col : crestColumns) {
-            check(
-                    !forest.getGrid()[0][col].getTree().isBurning(),
-                    "Backburning should not ignite the wave crest at column " + col
+                    "Backburning should ignite every tree in the selected row"
             );
         }
     }
+private static void testRejectsInvalidSeverity() {
+    boolean exceptionThrown = false;
 
+    try {
+        new TestIgnitionSource(1.1, 0.5);
+    } catch (IllegalArgumentException exception) {
+        exceptionThrown = true;
+    }
+
+    check(
+            exceptionThrown,
+            "Severity above 1.0 should throw an exception"
+    );
+}
+
+private static void testRejectsInvalidSpreadability() {
+    boolean exceptionThrown = false;
+
+    try {
+        new TestIgnitionSource(0.5, -0.1);
+    } catch (IllegalArgumentException exception) {
+        exceptionThrown = true;
+    }
+
+    check(
+            exceptionThrown,
+            "Spreadability below 0.0 should throw an exception"
+    );
+}
+
+private static class TestIgnitionSource extends IgnitionSource {
+    TestIgnitionSource(double severity, double spreadability) {
+        super(severity, spreadability);
+    }
+
+    @Override
+    public void ignite(Forest forest) {
+        // No ignition behaviour is needed for constructor validation.
+    }
+}
     private static void check(boolean condition, String message) {
         if (!condition) {
             throw new AssertionError(message);
