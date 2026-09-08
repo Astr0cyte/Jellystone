@@ -9,7 +9,7 @@ public class Main {
         Wind wind = new Wind(30, "EAST");
         forest.setWind(wind);
 
-        IgnitionSource source = new Arson(20, 30);
+        IgnitionSource source = new Arson(20, 20);
         source.ignite(forest);
 
         JFrame window = new JFrame("Forest Fire Simulation");

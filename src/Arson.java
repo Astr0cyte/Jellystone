@@ -5,7 +5,10 @@ public class Arson extends IgnitionSource {
 
     public Arson(int row, int col) {
 
-        super(1.0, 1.0);
+        // Weaker than a lightning strike (severity 0.8): a deliberately
+        // lit fire is smaller and only takes hold on sufficiently
+        // flammable fuel.
+        super(0.55, 0.5);
 
         this.row = row;
         this.col = col;
@@ -27,7 +30,12 @@ public class Arson extends IgnitionSource {
         Cell cell = grid[row][col];
 
         if (cell.hasTree()) {
-            cell.getTree().ignite(severity);
+
+            // Unlike lightning, a small deliberate fire isn't guaranteed
+            // to catch - the target needs to be flammable enough.
+            if (cell.getTree().getSpreadability() >= spreadability) {
+                cell.getTree().ignite(severity);
+            }
         }
     }
 }

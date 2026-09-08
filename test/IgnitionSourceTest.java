@@ -3,10 +3,11 @@ public class IgnitionSourceTest {
     public static void main(String[] args) {
         testArsonDefaults();
         testArsonIgnitesTargetCell();
+        testArsonDoesNotIgniteLowSpreadabilityTree();
         testLightningDefaults();
         testLightningIgnitesRandomCell();
         testBackburningDefaults();
-        testBackburningIgnitesWholeRow();
+        testBackburningIgnitesWaveColumns();
 
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -15,12 +16,12 @@ public class IgnitionSourceTest {
         Arson arson = new Arson(0, 0);
 
         check(
-                arson.severity == 1.0,
-                "Arson should use severity 1.0"
+                arson.severity == 0.55,
+                "Arson should use severity 0.55"
         );
         check(
-                arson.spreadability == 1.0,
-                "Arson should use spreadability 1.0"
+                arson.spreadability == 0.5,
+                "Arson should use spreadability 0.5"
         );
     }
 
@@ -34,6 +35,19 @@ public class IgnitionSourceTest {
         check(
                 forest.getGrid()[0][0].getTree().isBurning(),
                 "Arson should ignite the tree in its target cell"
+        );
+    }
+
+    private static void testArsonDoesNotIgniteLowSpreadabilityTree() {
+        Forest forest = new Forest(2, 2);
+        forest.getGrid()[0][0].plantTree(new Tree(0.1));
+
+        Arson arson = new Arson(0, 0);
+        arson.ignite(forest);
+
+        check(
+                !forest.getGrid()[0][0].getTree().isBurning(),
+                "Arson should not ignite a tree below its flammability threshold"
         );
     }
 
@@ -76,20 +90,32 @@ public class IgnitionSourceTest {
         );
     }
 
-    private static void testBackburningIgnitesWholeRow() {
-        Forest forest = new Forest(3, 3);
+    private static void testBackburningIgnitesWaveColumns() {
+        Forest forest = new Forest(1, 6);
 
-        for (int col = 0; col < 3; col++) {
+        for (int col = 0; col < 6; col++) {
             forest.getGrid()[0][col].plantTree(new Tree(0.9));
         }
 
         Backburning backburning = new Backburning(0);
         backburning.ignite(forest);
 
-        for (int col = 0; col < 3; col++) {
+        // With a 3-column wavelength, only the wave troughs (columns 2
+        // and 5) fall below the 0.4 threshold and ignite immediately.
+        int[] troughColumns = {2, 5};
+        int[] crestColumns = {0, 1, 3, 4};
+
+        for (int col : troughColumns) {
             check(
                     forest.getGrid()[0][col].getTree().isBurning(),
-                    "Backburning should ignite every tree in the selected row"
+                    "Backburning should ignite the wave trough at column " + col
+            );
+        }
+
+        for (int col : crestColumns) {
+            check(
+                    !forest.getGrid()[0][col].getTree().isBurning(),
+                    "Backburning should not ignite the wave crest at column " + col
             );
         }
     }
