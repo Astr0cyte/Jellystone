@@ -1,11 +1,22 @@
 public class Tree implements Burnable {
 
+    public enum TreeType {
+        OAK,
+        PINE, 
+        EUCALYPTUS,
+        BIRCH,
+        SPRUCE,
+        JUNGLE
+    }
+
     private boolean burning;
     private double spreadability;
+    private TreeType treeType;
 
     public Tree(double spreadability) {
         this.burning = false;
         this.spreadability = spreadability;
+        this.treeType = TreeType.OAK;
     }
 
     @Override
@@ -27,6 +38,10 @@ public class Tree implements Burnable {
 
     public double getSpreadability() {
         return spreadability;
+    }
+
+    public TreeType getTreeType() {
+        return treeType;
     }
 
     public void extinguish() {
