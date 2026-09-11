@@ -1,17 +1,7 @@
 public class Tree implements Burnable {
 
-    public enum TreeType {
-        OAK,
-        PINE, 
-        EUCALYPTUS,
-        BIRCH,
-        SPRUCE,
-        JUNGLE
-    }
-
     private boolean burning;
     private double spreadability;
-    private TreeType treeType;
     private double burnIntensity;
     private boolean alive;
     private double health;
@@ -19,23 +9,20 @@ public class Tree implements Burnable {
     private double burnIntensityFactor;
 
     public Tree(double spreadability) {
-        this(TreeType.OAK, spreadability, 100.0, 0.75);
+        this(spreadability, 100.0, 1.0);
     }
 
     protected Tree(
-            TreeType treeType,
             double spreadability,
             double maxHealth,
             double burnIntensityFactor) {
 
-        validateTreeType(treeType);
         validateSpreadability(spreadability);
         validateMaxHealth(maxHealth);
         validateBurnIntensityFactor(burnIntensityFactor);
 
         this.burning = false;
         this.spreadability = spreadability;
-        this.treeType = treeType;
         this.burnIntensity = 0.0;
         this.burnIntensityFactor = burnIntensityFactor;
         this.maxHealth = maxHealth;
@@ -102,10 +89,6 @@ public class Tree implements Burnable {
         return spreadability;
     }
 
-    public TreeType getTreeType() {
-        return treeType;
-    }
-
     public double getBurnIntensity() {
         return burnIntensity;
     }
@@ -131,8 +114,7 @@ public class Tree implements Burnable {
 
     @Override
     public String toString() {
-        return treeType
-                + " [health=" + health + "/" + maxHealth
+        return "[health=" + health + "/" + maxHealth
                 + ", spreadability=" + spreadability
                 + ", burnIntensity=" + burnIntensity
                 + ", burning=" + burning
@@ -140,15 +122,15 @@ public class Tree implements Burnable {
                 + "]";
     }
 
-    //exceptions
-    
-    private static void validateTreeType(TreeType treeType) {
-        if (treeType == null) {
-            throw new IllegalArgumentException(
-                    "Tree type must not be null"
-            );
+    public String getTreeType() {
+        if (getClass() == Tree.class) {
+            return "OAK";
         }
+
+        return getClass().getSimpleName().toUpperCase();
     }
+
+    //exceptions
 
     private static void validateSpreadability(double spreadability) {
         if (!Double.isFinite(spreadability)
