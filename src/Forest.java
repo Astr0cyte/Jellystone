@@ -72,10 +72,10 @@ public class Forest {
                 if (cell.hasTree() &&
                     cell.getTree().isBurning()) {
 
-                    trySpread(row - 1, col, igniteNext);
-                    trySpread(row + 1, col, igniteNext);
-                    trySpread(row, col - 1, igniteNext);
-                    trySpread(row, col + 1, igniteNext);
+                    trySpread(row, col, row - 1, col, igniteNext);
+                    trySpread(row, col, row + 1, col, igniteNext);
+                    trySpread(row, col, row, col - 1, igniteNext);
+                    trySpread(row, col, row, col + 1, igniteNext);
                 }
             }
         }
@@ -93,9 +93,11 @@ public class Forest {
     }
 
     private void trySpread(
-            int row,
-            int col,
-            boolean[][] igniteNext) {
+        int sourceRow,
+        int sourceCol,
+        int row,
+        int col,
+        boolean[][] igniteNext) {
 
         if (row < 0 ||
             row >= grid.length ||
@@ -118,7 +120,35 @@ public class Forest {
         double chance =
                 target.getTree().getSpreadability();
 
-        chance += target.getWindExposure() * 0.2;
+        if (wind != null) {
+
+            int rowDifference = row - sourceRow;
+            int colDifference = col - sourceCol;
+
+            String direction = wind.getDirection();
+
+            boolean withWind =
+                    (direction.equalsIgnoreCase("NORTH") && rowDifference < 0) ||
+                    (direction.equalsIgnoreCase("SOUTH") && rowDifference > 0) ||
+                    (direction.equalsIgnoreCase("EAST") && colDifference > 0) ||
+                    (direction.equalsIgnoreCase("WEST") && colDifference < 0);
+
+            boolean againstWind =
+                    (direction.equalsIgnoreCase("NORTH") && rowDifference > 0) ||
+                    (direction.equalsIgnoreCase("SOUTH") && rowDifference < 0) ||
+                    (direction.equalsIgnoreCase("EAST") && colDifference < 0) ||
+                    (direction.equalsIgnoreCase("WEST") && colDifference > 0);
+
+            if (withWind) {
+                chance += target.getWindExposure() * 0.2;
+            }
+            else if (againstWind) {
+                chance -= target.getWindExposure() * 0.1;
+            }
+            else {
+                chance += target.getWindExposure() * 0.05;
+            }
+        }
 
         chance += aridity * 0.2;
 
