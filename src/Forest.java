@@ -126,6 +126,8 @@ public class Forest {
 
         chance -= rainfall * 0.2;
 
+        chance = Math.max(0.0, Math.min(1.0, chance));
+
         if (random.nextDouble() < chance) {
             igniteNext[row][col] = true;
         }
