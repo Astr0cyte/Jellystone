@@ -122,6 +122,8 @@ public class Forest {
 
         chance += aridity * 0.2;
 
+        chance += (temperature / 100.0) * 0.2;
+
         chance -= rainfall * 0.2;
 
         if (random.nextDouble() < chance) {
