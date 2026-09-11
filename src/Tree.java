@@ -129,6 +129,17 @@ public class Tree implements Burnable {
         damage(30.0 * burnIntensity);
     }
 
+    @Override
+    public String toString() {
+        return treeType
+                + " [health=" + health + "/" + maxHealth
+                + ", spreadability=" + spreadability
+                + ", burnIntensity=" + burnIntensity
+                + ", burning=" + burning
+                + ", alive=" + alive
+                + "]";
+    }
+
     //exceptions
     
     private static void validateTreeType(TreeType treeType) {
