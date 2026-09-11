@@ -28,6 +28,11 @@ public class Tree implements Burnable {
             double maxHealth,
             double burnIntensityFactor) {
 
+        validateTreeType(treeType);
+        validateSpreadability(spreadability);
+        validateMaxHealth(maxHealth);
+        validateBurnIntensityFactor(burnIntensityFactor);
+
         this.burning = false;
         this.spreadability = spreadability;
         this.treeType = treeType;
@@ -68,6 +73,12 @@ public class Tree implements Burnable {
     }
 
     public void damage(double amount) {
+        if (!Double.isFinite(amount) || amount < 0.0) {
+            throw new IllegalArgumentException(
+                    "Damage must be a finite, non-negative value"
+            );
+        }
+
         if (!alive) {
             return;
         }
@@ -116,5 +127,44 @@ public class Tree implements Burnable {
         }
 
         damage(30.0 * burnIntensity);
+    }
+
+    //exceptions
+    
+    private static void validateTreeType(TreeType treeType) {
+        if (treeType == null) {
+            throw new IllegalArgumentException(
+                    "Tree type must not be null"
+            );
+        }
+    }
+
+    private static void validateSpreadability(double spreadability) {
+        if (!Double.isFinite(spreadability)
+                || spreadability < 0.0
+                || spreadability > 1.0) {
+            throw new IllegalArgumentException(
+                    "Spreadability must be between 0.0 and 1.0"
+            );
+        }
+    }
+
+    private static void validateMaxHealth(double maxHealth) {
+        if (!Double.isFinite(maxHealth) || maxHealth <= 0.0) {
+            throw new IllegalArgumentException(
+                    "Maximum health must be positive"
+            );
+        }
+    }
+
+    private static void validateBurnIntensityFactor(
+            double burnIntensityFactor) {
+
+        if (!Double.isFinite(burnIntensityFactor)
+                || burnIntensityFactor < 0.0) {
+            throw new IllegalArgumentException(
+                    "Burn intensity factor must be non-negative"
+            );
+        }
     }
 }
