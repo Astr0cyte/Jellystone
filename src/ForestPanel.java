@@ -1,12 +1,21 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class ForestPanel extends JPanel {
 
     private Forest forest;
 
+    private Image treeImage;
+    private Image fireImage;
+
     public ForestPanel(Forest forest) {
         this.forest = forest;
+
+        System.out.println(new java.io.File("images/tree.png").exists());
+        System.out.println(new java.io.File("images/fire.png").exists());
+        
+        treeImage = new ImageIcon("images/tree.png").getImage();
+        fireImage = new ImageIcon("images/fire.png").getImage();
     }
 
     @Override
@@ -24,15 +33,7 @@ public class ForestPanel extends JPanel {
 
                 Cell cell = grid[row][col];
 
-                if (!cell.hasTree()) {
-                    g.setColor(Color.BLACK);
-                }
-                else if (cell.getTree().isBurning()) {
-                    g.setColor(Color.RED);
-                }
-                else {
-                    g.setColor(Color.GREEN);
-                }
+                g.setColor(Color.BLACK);
 
                 g.fillRect(
                     col * cellWidth,
@@ -40,6 +41,30 @@ public class ForestPanel extends JPanel {
                     cellWidth,
                     cellHeight
                 );
+
+                if (!cell.hasTree()) {
+                    
+                }
+                else if (cell.getTree().isBurning()) {
+                    g.drawImage(
+                        fireImage,
+                        col * cellWidth + 2,
+                        row * cellHeight + 2,
+                        cellWidth - 4,
+                        cellHeight - 4,
+                        this
+                    );
+                }
+                else {
+                    g.drawImage(
+                        treeImage,
+                        col * cellWidth + 2,
+                        row * cellHeight + 2,
+                        cellWidth - 4,
+                        cellHeight - 4,
+                        this
+                    );
+                }
             }
         }
     }
