@@ -12,6 +12,7 @@ public class Tree implements Burnable {
     private boolean burning;
     private double spreadability;
     private TreeType treeType;
+    private double burnIntensity;
 
     public Tree(double spreadability) {
         this(TreeType.OAK, spreadability);
@@ -21,17 +22,20 @@ public class Tree implements Burnable {
         this.burning = false;
         this.spreadability = spreadability;
         this.treeType = treeType;
+        this.burnIntensity = 0.0;
     }
 
     @Override
     public void ignite() {
         burning = true;
+        burnIntensity = 1.0;
     }
 
     // OVERLOADED version
     public void ignite(double severity) {
         if (severity >= 0.5) {
             burning = true;
+            burnIntensity = Math.max(burnIntensity, severity);
         }
     }
 
@@ -48,7 +52,12 @@ public class Tree implements Burnable {
         return treeType;
     }
 
+    public double getBurnIntensity() {
+        return burnIntensity;
+    }
+
     public void extinguish() {
         burning = false;
+        burnIntensity = 0.0;
     }
 }
