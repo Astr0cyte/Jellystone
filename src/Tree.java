@@ -45,14 +45,17 @@ public class Tree implements Burnable {
         }
 
         burning = true;
-        burnIntensity = 1.0;
+        burnIntensity = burnIntensityFactor;
     }
 
     // OVERLOADED version
     public void ignite(double severity) {
         if (alive && severity >= 0.5) {
             burning = true;
-            burnIntensity = Math.max(burnIntensity, severity);
+            burnIntensity = Math.max(
+                    burnIntensity,
+                    severity * burnIntensityFactor
+            );
         }
     }
 
@@ -105,5 +108,13 @@ public class Tree implements Burnable {
         alive = false;
         burning = false;
         burnIntensity = 0.0;
+    }
+
+    public void advanceBurning() {
+        if (!burning || !alive) {
+            return;
+        }
+
+        damage(30.0 * burnIntensity);
     }
 }
