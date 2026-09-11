@@ -13,6 +13,8 @@ public class Tree implements Burnable {
     private double spreadability;
     private TreeType treeType;
     private double burnIntensity;
+    private int ignitionCount;
+    private boolean alive;
 
     public Tree(double spreadability) {
         this(TreeType.OAK, spreadability);
@@ -23,17 +25,31 @@ public class Tree implements Burnable {
         this.spreadability = spreadability;
         this.treeType = treeType;
         this.burnIntensity = 0.0;
+        this.ignitionCount = 0;
+        this.alive = true;
     }
 
     @Override
     public void ignite() {
+        if (!alive) {
+            return;
+        }
+
+        if (!burning) {
+            ignitionCount++;
+        }
+
         burning = true;
         burnIntensity = 1.0;
     }
 
     // OVERLOADED version
     public void ignite(double severity) {
-        if (severity >= 0.5) {
+        if (alive && severity >= 0.5) {
+            if (!burning) {
+                ignitionCount++;
+            }
+
             burning = true;
             burnIntensity = Math.max(burnIntensity, severity);
         }
@@ -42,6 +58,9 @@ public class Tree implements Burnable {
     @Override
     public boolean isBurning() {
         return burning;
+    }
+    public boolean isAlive() {
+        return alive;
     }
 
     public double getSpreadability() {
@@ -56,7 +75,17 @@ public class Tree implements Burnable {
         return burnIntensity;
     }
 
+    public int getIgnitionCount() {
+        return ignitionCount;
+    }
+
     public void extinguish() {
+        burning = false;
+        burnIntensity = 0.0;
+    }
+
+    public void kill() {
+        alive = false;
         burning = false;
         burnIntensity = 0.0;
     }
