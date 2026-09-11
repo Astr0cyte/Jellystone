@@ -14,9 +14,13 @@ public class Tree implements Burnable {
     private TreeType treeType;
 
     public Tree(double spreadability) {
+        this(TreeType.OAK, spreadability);
+    }
+
+    public Tree(TreeType treeType, double spreadability) {
         this.burning = false;
         this.spreadability = spreadability;
-        this.treeType = TreeType.OAK;
+        this.treeType = treeType;
     }
 
     @Override
