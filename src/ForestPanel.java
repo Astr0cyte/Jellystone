@@ -17,11 +17,11 @@ public class ForestPanel extends JPanel {
     public ForestPanel(Forest forest, Lightning lightning) {
         this.forest = forest;
         this.lightning = lightning;
-        
+
         System.out.println(new java.io.File("images/tree.png").exists());
         System.out.println(new java.io.File("images/fire.png").exists());
         System.out.println(new java.io.File("images/lightning.png").exists());
-        
+
         treeImage = new ImageIcon("images/tree.png").getImage();
         fireImage = new ImageIcon("images/fire.png").getImage();
         lightningImage = new ImageIcon("images/lightning.png").getImage();
@@ -35,6 +35,17 @@ public class ForestPanel extends JPanel {
 
         int cellWidth = getWidth() / grid[0].length;
         int cellHeight = getHeight() / grid.length;
+
+        Cell currentLightningCell = null;
+
+        if (lightning != null) {
+            currentLightningCell = lightning.getLastStruckCell();
+
+            if (currentLightningCell != lastLightningCell) {
+                lastLightningCell = currentLightningCell;
+                lightningStartTime = System.currentTimeMillis();
+            }
+        }
 
         for (int row = 0; row < grid.length; row++) {
 
@@ -50,15 +61,9 @@ public class ForestPanel extends JPanel {
                     cellWidth,
                     cellHeight
                 );
-                
-                Cell currentLightningCell = lightning.getLastStruckCell();
 
-                if (currentLightningCell != lastLightningCell) {
-                    lastLightningCell = currentLightningCell;
-                    lightningStartTime = System.currentTimeMillis();
-                }
-
-                if (cell == currentLightningCell &&
+                if (lightning != null &&
+                    cell == currentLightningCell &&
                     System.currentTimeMillis() - lightningStartTime < 3000) {
 
                     g.drawImage(
@@ -70,11 +75,14 @@ public class ForestPanel extends JPanel {
                         this
                     );
                 }
-                else{
+                else {
                     if (!cell.hasTree()) {
-                        
+
+                        // Empty cell stays black
+
                     }
                     else if (cell.getTree().isBurning()) {
+
                         g.drawImage(
                             fireImage,
                             col * cellWidth + 2,
@@ -85,6 +93,7 @@ public class ForestPanel extends JPanel {
                         );
                     }
                     else {
+
                         g.drawImage(
                             treeImage,
                             col * cellWidth + 2,
