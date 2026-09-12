@@ -76,6 +76,10 @@ public class Forest {
                     trySpread(row, col, row + 1, col, igniteNext);
                     trySpread(row, col, row, col - 1, igniteNext);
                     trySpread(row, col, row, col + 1, igniteNext);
+                    trySpread(row, col, row - 1, col - 1, igniteNext);
+                    trySpread(row, col, row - 1, col + 1, igniteNext);
+                    trySpread(row, col, row + 1, col - 1, igniteNext);
+                    trySpread(row, col, row + 1, col + 1, igniteNext);
                 }
             }
         }
