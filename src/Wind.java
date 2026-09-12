@@ -86,7 +86,7 @@ public class Wind {
             for (int col = 0; col < grid[row].length; col++) {
 
                 Cell cell = grid[row][col];
-                double exposure = calculateExposure(row, col);
+                double exposure = calculateExposure(col, row);
 
                 cell.setWindExposure(exposure);
             }
@@ -112,7 +112,7 @@ public class Wind {
 
 
 
-        public double calculateExposure(int x, int y) {
+    public double calculateExposure(int x, int y) {
         if (x < 0 || y < 0) {
             return 0.0;
         }
