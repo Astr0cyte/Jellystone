@@ -5,12 +5,17 @@ import java.util.Random;
 public class Lightning extends IgnitionSource {
     private Random random = new Random();
     private List<Cell> struckCells = new ArrayList<>();
+    private Cell lastStruckCell;
     private static final int MAX_ATTEMPTS = 10;
 
     public Lightning() {
         super(0.8, 0.7);
     }
 
+    public Cell getLastStruckCell() {
+        return lastStruckCell;
+    }
+    
     public void ignite(Forest forest) {
         Cell[][] grid = forest.getGrid();
 
@@ -22,10 +27,10 @@ public class Lightning extends IgnitionSource {
             if (struckCells.contains(cell)) {
                 continue;
             }
-
-            struckCells.add(cell);
-
+            
             if (cell.hasTree()) {
+                lastStruckCell = cell;
+                struckCells.add(cell);
                 cell.getTree().ignite(this.severity);
                 return;
             }

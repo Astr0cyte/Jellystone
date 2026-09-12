@@ -8,14 +8,23 @@ public class ForestPanel extends JPanel {
     private Image treeImage;
     private Image fireImage;
 
-    public ForestPanel(Forest forest) {
-        this.forest = forest;
+    private Lightning lightning;
+    private Image lightningImage;
 
+    private Cell lastLightningCell;
+    private long lightningStartTime;
+
+    public ForestPanel(Forest forest, Lightning lightning) {
+        this.forest = forest;
+        this.lightning = lightning;
+        
         System.out.println(new java.io.File("images/tree.png").exists());
         System.out.println(new java.io.File("images/fire.png").exists());
+        System.out.println(new java.io.File("images/lightning.png").exists());
         
         treeImage = new ImageIcon("images/tree.png").getImage();
         fireImage = new ImageIcon("images/fire.png").getImage();
+        lightningImage = new ImageIcon("images/lightning.png").getImage();
     }
 
     @Override
@@ -41,13 +50,19 @@ public class ForestPanel extends JPanel {
                     cellWidth,
                     cellHeight
                 );
+                
+                Cell currentLightningCell = lightning.getLastStruckCell();
 
-                if (!cell.hasTree()) {
-                    
+                if (currentLightningCell != lastLightningCell) {
+                    lastLightningCell = currentLightningCell;
+                    lightningStartTime = System.currentTimeMillis();
                 }
-                else if (cell.getTree().isBurning()) {
+
+                if (cell == currentLightningCell &&
+                    System.currentTimeMillis() - lightningStartTime < 3000) {
+
                     g.drawImage(
-                        fireImage,
+                        lightningImage,
                         col * cellWidth + 2,
                         row * cellHeight + 2,
                         cellWidth - 4,
@@ -55,15 +70,30 @@ public class ForestPanel extends JPanel {
                         this
                     );
                 }
-                else {
-                    g.drawImage(
-                        treeImage,
-                        col * cellWidth + 2,
-                        row * cellHeight + 2,
-                        cellWidth - 4,
-                        cellHeight - 4,
-                        this
-                    );
+                else{
+                    if (!cell.hasTree()) {
+                        
+                    }
+                    else if (cell.getTree().isBurning()) {
+                        g.drawImage(
+                            fireImage,
+                            col * cellWidth + 2,
+                            row * cellHeight + 2,
+                            cellWidth - 4,
+                            cellHeight - 4,
+                            this
+                        );
+                    }
+                    else {
+                        g.drawImage(
+                            treeImage,
+                            col * cellWidth + 2,
+                            row * cellHeight + 2,
+                            cellWidth - 4,
+                            cellHeight - 4,
+                            this
+                        );
+                    }
                 }
             }
         }
