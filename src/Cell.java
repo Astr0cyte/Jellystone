@@ -41,7 +41,17 @@ class Cell {
         return this.tree;
     }
 
-        public double getWindExposure() {
+    public Tree removeTree() {
+        Tree removedTree = tree;
+        tree = null;
+        return removedTree;
+    }
+
+    public boolean isEmpty() {
+        return !hasTree();
+    }
+    
+    public double getWindExposure() {
         return windExposure;
     }
 

@@ -6,15 +6,24 @@ public class Main {
 
         Forest forest = new Forest(40, 60);
 
-        Wind wind = new Wind(30, "EAST");
+        Wind wind = new Wind(30, "EAST", 30, 20, 15);
         forest.setWind(wind);
 
         IgnitionSource source = new Arson(20, 20);
         source.ignite(forest);
+        
+        Lightning lightning = new Lightning();
+
+        try {
+            lightning.ignite(forest);
+        } 
+        catch (IllegalStateException e) {
+            System.out.println("Lightning strike missed: " + e.getMessage());
+        }
 
         JFrame window = new JFrame("Forest Fire Simulation");
 
-        ForestPanel panel = new ForestPanel(forest);
+        ForestPanel panel = new ForestPanel(forest, lightning);
 
         window.add(panel);
 

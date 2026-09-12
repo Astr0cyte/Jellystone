@@ -1,0 +1,12 @@
+// USE FOR MAIN
+
+WindVisualization windVisualization = new WindVisualization(forest);
+
+JPanel gridLayers = new JPanel();
+gridLayers.setLayout(new OverlayLayout(gridLayers));
+windVisualization.setAlignmentX(0.5f);
+windVisualization.setAlignmentY(0.5f);
+panel.setAlignmentX(0.5f);
+panel.setAlignmentY(0.5f);
+gridLayers.add(windVisualization);
+gridLayers.add(panel);

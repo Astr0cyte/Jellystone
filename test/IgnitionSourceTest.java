@@ -10,6 +10,7 @@ public class IgnitionSourceTest {
         testBackburningIgnitesWaveColumns();
         testRejectsInvalidSeverity();
         testRejectsInvalidSpreadability();
+        testIgnitionSourcePolymorphism();
         
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -114,6 +115,28 @@ public class IgnitionSourceTest {
             );
         }
     }
+
+private static void testIgnitionSourcePolymorphism() {
+    IgnitionSource[] sources = {
+            new Arson(0, 0),
+            new Lightning(),
+            new Backburning(0)
+    };
+
+    for (IgnitionSource source : sources) {
+        Forest forest = new Forest(1, 1);
+        forest.getGrid()[0][0].plantTree(new Tree(0.9));
+
+        source.ignite(forest);
+
+        check(
+                forest.getGrid()[0][0].getTree().isBurning(),
+                source.getClass().getSimpleName()
+                        + " should ignite through an IgnitionSource reference"
+        );
+    }
+}
+
 private static void testRejectsInvalidSeverity() {
     boolean exceptionThrown = false;
 
