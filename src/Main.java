@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.Random;
 
 public class Main {
 
@@ -9,17 +10,35 @@ public class Main {
         Wind wind = new Wind(30, "EAST", 30, 20, 15);
         forest.setWind(wind);
 
-        IgnitionSource source = new Arson(20, 20);
-        source.ignite(forest);
-        
-        Lightning lightning = new Lightning();
+
+        Random random = new Random();
+
+        IgnitionSource source;
+        Lightning lightning = null;
+
+        int choice = random.nextInt(3);
+
+        if (choice == 0) {
+            lightning = new Lightning();
+            source = lightning;
+            System.out.println("Ignition source: Lightning");
+
+        } else if (choice == 1) {
+            source = new Arson(20, 20);
+            System.out.println("Ignition source: Arson");
+
+        } else {
+            source = new Backburning(20);
+            System.out.println("Ignition source: Backburning");
+        }
 
         try {
-            lightning.ignite(forest);
-        } 
-        catch (IllegalStateException e) {
-            System.out.println("Lightning strike missed: " + e.getMessage());
+            source.ignite(forest);
         }
+        catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("Ignition failed: " + e.getMessage());
+        }
+
 
         JFrame window = new JFrame("Forest Fire Simulation");
 
