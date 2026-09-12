@@ -68,7 +68,7 @@ public class Wind {
         Cell[][] grid = forest.getGrid();
 
         if (grid.length == 0 || grid[0].length == 0) {
-            throw new WindStateException(
+            throw new WindArgumentException(
                     "Wind cannot be applied to an empty forest"
             );
         }
