@@ -56,8 +56,34 @@ public class Forest {
     public void update() {
 
         spreadFire();
+        advanceBurningTrees();
     }
 
+
+    private void advanceBurningTrees() {
+
+        for (Cell[] row : grid) {
+
+            for (Cell cell : row) {
+
+                if (!cell.hasTree()) {
+                    continue;
+                }
+
+                Tree tree = cell.getTree();
+
+                if (tree.isBurning()) {
+                    tree.advanceBurning();
+                }
+
+                if (!tree.isAlive()) {
+                    cell.removeTree();
+                }
+            }
+        }
+    }
+
+    
     private void spreadFire() {
 
         boolean[][] igniteNext =
