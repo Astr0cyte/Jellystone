@@ -56,8 +56,34 @@ public class Forest {
     public void update() {
 
         spreadFire();
+        advanceBurningTrees();
     }
 
+
+    private void advanceBurningTrees() {
+
+        for (Cell[] row : grid) {
+
+            for (Cell cell : row) {
+
+                if (!cell.hasTree()) {
+                    continue;
+                }
+
+                Tree tree = cell.getTree();
+
+                if (tree.isBurning()) {
+                    tree.advanceBurning();
+                }
+
+                if (!tree.isAlive()) {
+                    cell.removeTree();
+                }
+            }
+        }
+    }
+
+    
     private void spreadFire() {
 
         boolean[][] igniteNext =
@@ -72,10 +98,14 @@ public class Forest {
                 if (cell.hasTree() &&
                     cell.getTree().isBurning()) {
 
-                    trySpread(row - 1, col, igniteNext);
-                    trySpread(row + 1, col, igniteNext);
-                    trySpread(row, col - 1, igniteNext);
-                    trySpread(row, col + 1, igniteNext);
+                    trySpread(row, col, row - 1, col, igniteNext);
+                    trySpread(row, col, row + 1, col, igniteNext);
+                    trySpread(row, col, row, col - 1, igniteNext);
+                    trySpread(row, col, row, col + 1, igniteNext);
+                    trySpread(row, col, row - 1, col - 1, igniteNext);
+                    trySpread(row, col, row - 1, col + 1, igniteNext);
+                    trySpread(row, col, row + 1, col - 1, igniteNext);
+                    trySpread(row, col, row + 1, col + 1, igniteNext);
                 }
             }
         }
@@ -93,9 +123,11 @@ public class Forest {
     }
 
     private void trySpread(
-            int row,
-            int col,
-            boolean[][] igniteNext) {
+        int sourceRow,
+        int sourceCol,
+        int row,
+        int col,
+        boolean[][] igniteNext) {
 
         if (row < 0 ||
             row >= grid.length ||
@@ -118,11 +150,23 @@ public class Forest {
         double chance =
                 target.getTree().getSpreadability();
 
-        chance += target.getWindExposure() * 0.2;
+        if (wind != null) {
+
+            chance += wind.getSpreadModifier(
+                    sourceCol,
+                    sourceRow,
+                    col,
+                    row
+            );
+}
 
         chance += aridity * 0.2;
 
+        chance += (temperature / 100.0) * 0.2;
+
         chance -= rainfall * 0.2;
+
+        chance = Math.max(0.0, Math.min(1.0, chance));
 
         if (random.nextDouble() < chance) {
             igniteNext[row][col] = true;
