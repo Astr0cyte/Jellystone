@@ -126,33 +126,13 @@ public class Forest {
 
         if (wind != null) {
 
-            int rowDifference = row - sourceRow;
-            int colDifference = col - sourceCol;
-
-            String direction = wind.getDirection();
-
-            boolean withWind =
-                    (direction.equalsIgnoreCase("NORTH") && rowDifference < 0) ||
-                    (direction.equalsIgnoreCase("SOUTH") && rowDifference > 0) ||
-                    (direction.equalsIgnoreCase("EAST") && colDifference > 0) ||
-                    (direction.equalsIgnoreCase("WEST") && colDifference < 0);
-
-            boolean againstWind =
-                    (direction.equalsIgnoreCase("NORTH") && rowDifference > 0) ||
-                    (direction.equalsIgnoreCase("SOUTH") && rowDifference < 0) ||
-                    (direction.equalsIgnoreCase("EAST") && colDifference < 0) ||
-                    (direction.equalsIgnoreCase("WEST") && colDifference > 0);
-
-            if (withWind) {
-                chance += target.getWindExposure() * 0.2;
-            }
-            else if (againstWind) {
-                chance -= target.getWindExposure() * 0.1;
-            }
-            else {
-                chance += target.getWindExposure() * 0.05;
-            }
-        }
+            chance += wind.getSpreadModifier(
+                    sourceCol,
+                    sourceRow,
+                    col,
+                    row
+            );
+}
 
         chance += aridity * 0.2;
 
