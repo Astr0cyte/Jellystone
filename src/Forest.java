@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Forest {
@@ -11,6 +13,9 @@ public class Forest {
     private Wind wind;
 
     private Random random = new Random();
+    private final List<GuardianPulse> guardianPulses = new ArrayList<>();
+
+    public record GuardianPulse(int row, int column) {}
 
     public Forest(int rows, int columns) {
 
@@ -50,7 +55,7 @@ public class Forest {
             for (int c = Math.max(0, column - radius); c <= Math.min(grid[r].length - 1, column + radius); c++) {
                 int dy = r - row;
                 int dx = c - column;
-                if ((dx != 0 || dy != 0) && dx * dx + dy * dy <= radius * radius
+                if ((dx != 0 || dy != 0) && GuardianTree.isWithinRadius(dy, dx)
                         && grid[r][c].getTree() instanceof GuardianTree guardian && guardian.isAlive()) {
                     return true;
                 }
@@ -75,17 +80,22 @@ public class Forest {
     }
 
     public void update() {
-
+        guardianPulses.clear();
         spreadFire();
         advanceBurningTrees();
+        for (GuardianPulse pulse : guardianPulses) {
+            extinguishAround(pulse);
+        }
     }
 
+    public List<GuardianPulse> getGuardianPulses() {
+        return List.copyOf(guardianPulses);
+    }
 
     private void advanceBurningTrees() {
-
-        for (Cell[] row : grid) {
-
-            for (Cell cell : row) {
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                Cell cell = grid[row][col];
 
                 if (!cell.hasTree()) {
                     continue;
@@ -99,6 +109,24 @@ public class Forest {
 
                 if (!tree.isAlive()) {
                     cell.removeTree();
+                    if (tree instanceof GuardianTree) {
+                        guardianPulses.add(new GuardianPulse(row, col));
+                    }
+                }
+            }
+        }
+    }
+
+    private void extinguishAround(GuardianPulse pulse) {
+        int radius = GuardianTree.PROTECTION_RADIUS;
+        for (int row = Math.max(0, pulse.row() - radius);
+                row <= Math.min(grid.length - 1, pulse.row() + radius); row++) {
+            for (int col = Math.max(0, pulse.column() - radius);
+                    col <= Math.min(grid[row].length - 1, pulse.column() + radius); col++) {
+                Tree tree = grid[row][col].getTree();
+                if (tree != null && tree.isBurning()
+                        && GuardianTree.isWithinRadius(row - pulse.row(), col - pulse.column())) {
+                    tree.extinguish();
                 }
             }
         }

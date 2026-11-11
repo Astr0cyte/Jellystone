@@ -184,5 +184,20 @@ public class ForestPanel extends JPanel {
                 }
             }
         }
+        drawGuardianPulses(g, cellWidth, cellHeight);
+    }
+
+    private void drawGuardianPulses(Graphics g, int cellWidth, int cellHeight) {
+        int radius = GuardianTree.PROTECTION_RADIUS;
+        for (Forest.GuardianPulse pulse : forest.getGuardianPulses()) {
+            int x = pulse.column() * cellWidth + cellWidth / 2 - radius * cellWidth;
+            int y = pulse.row() * cellHeight + cellHeight / 2 - radius * cellHeight;
+            int width = 2 * radius * cellWidth;
+            int height = 2 * radius * cellHeight;
+            g.setColor(new Color(255, 215, 80, 100));
+            g.fillOval(x, y, width, height);
+            g.setColor(new Color(255, 235, 150));
+            g.drawOval(x, y, width, height);
+        }
     }
 }
