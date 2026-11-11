@@ -12,6 +12,7 @@ public class TreeCellTest {
         testGuardianLastStand();
         testFireReplay();
         testAshBloom();
+        testMixedSpecies();
         testValidation();
 
         System.out.println("All Tree/Cell tests passed.");
@@ -277,6 +278,27 @@ public class TreeCellTest {
 
         forest.update();
         check(grid[1][1].getTree() == seedling, "Ash Bloom should run once after a fire");
+    }
+
+    private static void testMixedSpecies() {
+        Forest mixed = new Forest(40, 60, true);
+        check(mixed.countTreesBySpecies().keySet().equals(
+                        java.util.Set.of("OAK", "BIRCH", "EUCALYPTUS", "SPRUCE")),
+                "Mixed planting should include the four selected species");
+
+        Forest sample = new Forest(1, 5);
+        Cell[] row = sample.getGrid()[0];
+        row[0].plantTree(new Oak(0.5));
+        row[1].plantTree(new Oak(0.5));
+        row[2].plantTree(new Birch(0.5));
+        row[3].plantTree(new GuardianTree());
+        row[4].plantTree(new Seedling());
+        check(sample.countTreesBySpecies().equals(java.util.Map.of("OAK", 2L, "BIRCH", 1L)),
+                "Species counts should exclude Guardians and seedlings");
+
+        row[0].getTree().kill();
+        check(sample.countTreesBySpecies().equals(java.util.Map.of("OAK", 1L, "BIRCH", 1L)),
+                "Species counts should include only living trees");
     }
 
     private static void testValidation() {
