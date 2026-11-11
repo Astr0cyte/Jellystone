@@ -20,6 +20,7 @@ public class ForestPanel extends JPanel {
     public ForestPanel(Forest forest, Lightning lightning) {
         this.forest = forest;
         this.lightning = lightning;
+        setBackground(new Color(201, 165, 120));
 
         System.out.println(new java.io.File("images/tree.png").exists());
         System.out.println(new java.io.File("images/fire.png").exists());
@@ -30,6 +31,8 @@ public class ForestPanel extends JPanel {
         fireImages.put(FireColor.ORANGE, fireIcon.getImage());
         fireImages.put(FireColor.BLUE, tintFire(fireIcon, new Color(0, 0, 128), new Color(127, 255, 255)));
         fireImages.put(FireColor.PURPLE, tintFire(fireIcon, new Color(52, 0, 105), new Color(194, 138, 255)));
+        fireImages.put(FireColor.BLACK, tintFire(fireIcon, new Color(10, 10, 10), new Color(64, 64, 64)));
+        fireImages.put(FireColor.WHITE, tintFire(fireIcon, new Color(179, 179, 179), Color.WHITE));
         lightningImage = new ImageIcon("images/lightning.png").getImage();
     }
 
@@ -93,7 +96,7 @@ public class ForestPanel extends JPanel {
 
                 Cell cell = grid[row][col];
 
-                g.setColor(Color.BLACK);
+                g.setColor(getBackground());
 
                 g.fillRect(
                     col * cellWidth,
@@ -118,7 +121,7 @@ public class ForestPanel extends JPanel {
                 else {
                     if (!cell.hasTree()) {
 
-                        // Empty cell stays black
+                        // Empty cells show the soil background.
 
                     }
                     else if (cell.getTree().isBurning()) {

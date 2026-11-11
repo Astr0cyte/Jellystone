@@ -26,6 +26,10 @@ public class Main {
             source = new PhoenixRising();
             System.out.println("Ignition source: Phoenix Rising");
 
+        } else if (args.length > 0 && "serpent".equalsIgnoreCase(args[0])) {
+            source = new FireSerpent();
+            System.out.println("Ignition source: Fire Serpent");
+
         } else if (choice == 0) {
             lightning = new Lightning();
             source = lightning;
