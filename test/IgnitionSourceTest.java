@@ -114,9 +114,19 @@ public class IgnitionSourceTest {
         for (int col : troughColumns) {
             check(
                     forest.getGrid()[0][col].getTree().isBurning(),
-                    "Backburning should ignite every tree in the selected row"
+                    "Backburning should ignite trees in the wave troughs"
             );
         }
+        for (int col : crestColumns) {
+            check(!forest.getGrid()[0][col].getTree().isBurning(),
+                    "Backburning should leave the other columns untouched");
+        }
+
+        forest.getGrid()[0][2].removeTree();
+        forest.getGrid()[0][5].getTree().extinguish();
+        backburning.ignite(forest);
+        check(!forest.getGrid()[0][2].hasTree() && forest.getGrid()[0][5].getTree().isBurning(),
+                "An empty trough should not prevent other troughs from igniting");
     }
 
     private static void testIgnitionSourcePolymorphism() {
