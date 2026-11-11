@@ -14,6 +14,7 @@ public class ForestPanel extends JPanel {
     private static final Color PROTECTED_SOIL = new Color(171, 190, 131);
     private static final int GUARDIAN_SPRITE_SCALE = 4;
     private final Map<FireColor, Image> fireImages = new EnumMap<>(FireColor.class);
+    private final Map<Class<? extends Tree>, Image> speciesImages;
 
     private Lightning lightning;
     private Image lightningImage;
@@ -24,13 +25,19 @@ public class ForestPanel extends JPanel {
     public ForestPanel(Forest forest, Lightning lightning) {
         this.forest = forest;
         this.lightning = lightning;
-        setBackground(new Color(201, 165, 120));
+        setBackground(new Color(117, 76, 50));
 
         System.out.println(new java.io.File("images/tree.png").exists());
         System.out.println(new java.io.File("images/fire.png").exists());
         System.out.println(new java.io.File("images/lightning.png").exists());
 
-        treeImage = new ImageIcon("images/tree.png").getImage();
+        ImageIcon treeIcon = new ImageIcon("images/tree.png");
+        treeImage = treeIcon.getImage();
+        speciesImages = Map.of(
+                Oak.class, tintSprite(treeIcon, new Color(155, 99, 0), new Color(255, 249, 35), true),
+                Birch.class, tintSprite(treeIcon, new Color(63, 112, 0), new Color(188, 255, 37), true),
+                Eucalyptus.class, tintSprite(treeIcon, new Color(0, 100, 117), new Color(39, 255, 255), true),
+                Spruce.class, tintSprite(treeIcon, new Color(143, 0, 67), new Color(255, 81, 186), true));
         seedlingImage = new ImageIcon("images/ash-bloom-seedling.png").getImage();
         guardianImage = new ImageIcon("images/guardian-tree-gold.png").getImage();
         ImageIcon fireIcon = new ImageIcon("images/fire.png");
@@ -43,14 +50,22 @@ public class ForestPanel extends JPanel {
     }
 
     private Image tintFire(ImageIcon fireIcon, Color shadow, Color highlight) {
-        if (fireIcon.getIconWidth() <= 0 || fireIcon.getIconHeight() <= 0) {
-            return fireIcon.getImage();
+        return tintSprite(fireIcon, shadow, highlight, false);
+    }
+
+    private Image tintSprite(ImageIcon icon, Color shadow, Color highlight, boolean canopyOnly) {
+        if (icon.getIconWidth() <= 0 || icon.getIconHeight() <= 0) {
+            return icon.getImage();
         }
 
+        int width = canopyOnly ? Math.min(128, icon.getIconWidth()) : icon.getIconWidth();
+        int height = canopyOnly ? Math.min(128, icon.getIconHeight()) : icon.getIconHeight();
         BufferedImage image = new BufferedImage(
-                fireIcon.getIconWidth(), fireIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+                width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
-        graphics.drawImage(fireIcon.getImage(), 0, 0, null);
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics.drawImage(icon.getImage(), 0, 0, width, height, null);
         graphics.dispose();
 
         for (int y = 0; y < image.getHeight(); y++) {
@@ -60,6 +75,9 @@ public class ForestPanel extends JPanel {
                 int red = (pixel >>> 16) & 255;
                 int green = (pixel >>> 8) & 255;
                 int blue = pixel & 255;
+                if (canopyOnly && (green <= red || green <= blue)) {
+                    continue;
+                }
                 int brightness = (3 * red + 6 * green + blue) / 10;
                 Color tint = new Color(
                         blend(shadow.getRed(), highlight.getRed(), brightness),
@@ -147,7 +165,8 @@ public class ForestPanel extends JPanel {
                     else {
 
                         g.drawImage(
-                            cell.getTree() instanceof Seedling ? seedlingImage : treeImage,
+                            cell.getTree() instanceof Seedling ? seedlingImage
+                                    : speciesImages.getOrDefault(cell.getTree().getClass(), treeImage),
                             col * cellWidth + 2,
                             row * cellHeight + 2,
                             cellWidth - 4,

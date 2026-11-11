@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
@@ -9,7 +10,8 @@ public class Main {
             return;
         }
 
-        Forest forest = new Forest(40, 60);
+        boolean mixedSpecies = Arrays.stream(args).anyMatch("mixed"::equalsIgnoreCase);
+        Forest forest = new Forest(40, 60, mixedSpecies);
 
         Wind wind = new Wind(30, "EAST", 30, 20, 15);
         forest.setWind(wind);
@@ -17,6 +19,9 @@ public class Main {
 
         Random random = new Random();
         plantGuardians(forest, random);
+        if (mixedSpecies) {
+            System.out.println("Starting trees by species: " + forest.countTreesBySpecies());
+        }
 
         IgnitionSource source;
         Lightning lightning = null;
@@ -70,7 +75,11 @@ public class Main {
 
         Timer timer = new Timer(500, event -> {
 
+            boolean fireWasActive = mixedSpecies && forest.hasBurningTrees();
             forest.update();
+            if (fireWasActive && !forest.hasBurningTrees()) {
+                System.out.println("Surviving trees by species: " + forest.countTreesBySpecies());
+            }
 
             panel.repaint();
 

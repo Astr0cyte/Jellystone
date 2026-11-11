@@ -1,6 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class Forest {
 
@@ -20,14 +24,18 @@ public class Forest {
     public record GuardianPulse(int row, int column) {}
 
     public Forest(int rows, int columns) {
-        this(rows, columns, new Random(), false);
+        this(rows, columns, false);
+    }
+
+    public Forest(int rows, int columns, boolean mixedSpecies) {
+        this(rows, columns, new Random(), false, mixedSpecies);
     }
 
     public Forest(int rows, int columns, long seed) {
-        this(rows, columns, new Random(seed), true);
+        this(rows, columns, new Random(seed), true, false);
     }
 
-    private Forest(int rows, int columns, Random random, boolean replay) {
+    private Forest(int rows, int columns, Random random, boolean replay, boolean mixedSpecies) {
         this.random = random;
         replayRolls = replay ? new double[rows][columns][9] : null;
 
@@ -50,11 +58,30 @@ public class Forest {
                             0.3 + random.nextDouble() * 0.7;
 
                     grid[row][col].plantTree(
-                            new Tree(spreadability)
+                            mixedSpecies ? createMixedTree(spreadability) : new Tree(spreadability)
                     );
                 }
             }
         }
+    }
+
+    private Tree createMixedTree(double spreadability) {
+        return switch (random.nextInt(4)) {
+            case 0 -> new Oak(spreadability);
+            case 1 -> new Birch(spreadability);
+            case 2 -> new Eucalyptus(spreadability);
+            default -> new Spruce(spreadability);
+        };
+    }
+
+    public Map<String, Long> countTreesBySpecies() {
+        return Arrays.stream(grid)
+                .flatMap(Arrays::stream)
+                .filter(Cell::hasTree)
+                .map(Cell::getTree)
+                .filter(tree -> tree.isAlive() && !(tree instanceof GuardianTree)
+                        && !(tree instanceof Seedling))
+                .collect(Collectors.groupingBy(Tree::getTreeType, TreeMap::new, Collectors.counting()));
     }
 
     public Cell[][] getGrid() {
@@ -108,7 +135,7 @@ public class Forest {
         return List.copyOf(guardianPulses);
     }
 
-    private boolean hasBurningTrees() {
+    boolean hasBurningTrees() {
         for (Cell[] row : grid) {
             for (Cell cell : row) {
                 if (cell.hasTree() && cell.getTree().isBurning()) {
