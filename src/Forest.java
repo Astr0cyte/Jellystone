@@ -15,6 +15,7 @@ public class Forest {
     private final Random random;
     private final double[][][] replayRolls;
     private final List<GuardianPulse> guardianPulses = new ArrayList<>();
+    private final List<Cell> burntCells = new ArrayList<>();
 
     public record GuardianPulse(int row, int column) {}
 
@@ -92,6 +93,10 @@ public class Forest {
 
     public void update() {
         guardianPulses.clear();
+        if (!burntCells.isEmpty() && !hasBurningTrees()) {
+            growSeedlings();
+            return;
+        }
         spreadFire();
         advanceBurningTrees();
         for (GuardianPulse pulse : guardianPulses) {
@@ -101,6 +106,38 @@ public class Forest {
 
     public List<GuardianPulse> getGuardianPulses() {
         return List.copyOf(guardianPulses);
+    }
+
+    private boolean hasBurningTrees() {
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                if (cell.hasTree() && cell.getTree().isBurning()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void growSeedlings() {
+        for (Cell cell : burntCells) {
+            if (!cell.hasTree() && hasSurvivingNeighbour(cell.getX(), cell.getY())) {
+                cell.plantTree(new Seedling());
+            }
+        }
+        burntCells.clear();
+    }
+
+    private boolean hasSurvivingNeighbour(int row, int col) {
+        for (int r = Math.max(0, row - 1); r <= Math.min(grid.length - 1, row + 1); r++) {
+            for (int c = Math.max(0, col - 1); c <= Math.min(grid[r].length - 1, col + 1); c++) {
+                Tree tree = grid[r][c].getTree();
+                if (tree != null && tree.isAlive() && !(tree instanceof Seedling)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void advanceBurningTrees() {
@@ -116,6 +153,9 @@ public class Forest {
 
                 if (tree.isBurning()) {
                     tree.advanceBurning();
+                    if (!tree.isAlive()) {
+                        burntCells.add(cell);
+                    }
                 }
 
                 if (!tree.isAlive()) {
