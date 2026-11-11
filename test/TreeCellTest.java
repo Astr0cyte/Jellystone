@@ -11,6 +11,7 @@ public class TreeCellTest {
         testGuardianProtection();
         testGuardianLastStand();
         testFireReplay();
+        testAshBloom();
         testValidation();
 
         System.out.println("All Tree/Cell tests passed.");
@@ -239,6 +240,43 @@ public class TreeCellTest {
         check(first.withGuardians().total() <= first.startingTrees()
                         && first.withoutGuardians().total() <= first.startingTrees(),
                 "Survivors should never exceed the starting tree count");
+    }
+
+    private static void testAshBloom() {
+        Forest forest = new Forest(7, 7);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.removeTree();
+            }
+        }
+
+        Tree nearAsh = new Tree(0.5, 20.0, 1.0);
+        Tree farAsh = new Tree(0.5, 20.0, 1.0);
+        Tree lastFire = new Tree(0.5);
+        nearAsh.ignite();
+        farAsh.ignite();
+        lastFire.ignite();
+        grid[1][1].plantTree(nearAsh);
+        grid[5][5].plantTree(farAsh);
+        grid[6][0].plantTree(lastFire);
+        forest.update();
+
+        Tree survivor = new Tree(0.5);
+        grid[1][2].plantTree(survivor);
+        forest.update();
+        check(!grid[1][1].hasTree(), "Seedlings should wait for the last fire to go out");
+        lastFire.extinguish();
+
+        forest.update();
+        Tree seedling = grid[1][1].getTree();
+        check(seedling instanceof Seedling, "Burnt ground next to a survivor should regrow");
+        check(!grid[1][3].hasTree(), "Previously empty cells should not regrow");
+        check(!grid[5][5].hasTree(), "Isolated burnt cells should not regrow");
+        check(grid[1][2].getTree() == survivor, "Ash Bloom should keep surviving trees");
+
+        forest.update();
+        check(grid[1][1].getTree() == seedling, "Ash Bloom should run once after a fire");
     }
 
     private static void testValidation() {

@@ -9,6 +9,7 @@ public class ForestPanel extends JPanel {
     private Forest forest;
 
     private Image treeImage;
+    private Image seedlingImage;
     private Image guardianImage;
     private static final Color PROTECTED_SOIL = new Color(171, 190, 131);
     private static final int GUARDIAN_SPRITE_SCALE = 4;
@@ -30,6 +31,7 @@ public class ForestPanel extends JPanel {
         System.out.println(new java.io.File("images/lightning.png").exists());
 
         treeImage = new ImageIcon("images/tree.png").getImage();
+        seedlingImage = new ImageIcon("images/ash-bloom-seedling.png").getImage();
         guardianImage = new ImageIcon("images/guardian-tree-gold.png").getImage();
         ImageIcon fireIcon = new ImageIcon("images/fire.png");
         fireImages.put(FireColor.ORANGE, fireIcon.getImage());
@@ -145,7 +147,7 @@ public class ForestPanel extends JPanel {
                     else {
 
                         g.drawImage(
-                            treeImage,
+                            cell.getTree() instanceof Seedling ? seedlingImage : treeImage,
                             col * cellWidth + 2,
                             row * cellHeight + 2,
                             cellWidth - 4,
