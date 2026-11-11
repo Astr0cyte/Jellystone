@@ -9,6 +9,7 @@ public class TreeCellTest {
         testDamageAndDeath();
         testCellRemoval();
         testGuardianProtection();
+        testGuardianLastStand();
         testValidation();
 
         System.out.println("All Tree/Cell tests passed.");
@@ -191,6 +192,41 @@ public class TreeCellTest {
         second.kill();
         check(forest.applyGuardianProtection(0.8, 4, 4) == 0.8,
                 "Spread chance should return to normal after both Guardians die");
+    }
+
+    private static void testGuardianLastStand() {
+        Forest forest = new Forest(9, 9);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.removeTree();
+            }
+        }
+
+        GuardianTree guardian = new GuardianTree();
+        guardian.damage(guardian.getMaxHealth() - 20);
+        guardian.ignite();
+        grid[4][4].plantTree(guardian);
+        Tree inside = new Tree(0.5);
+        inside.ignite();
+        grid[4][7].plantTree(inside);
+        Tree outside = new Tree(0.5);
+        outside.ignite();
+        grid[7][5].plantTree(outside);
+
+        forest.update();
+        check(!grid[4][4].hasTree(), "The dead Guardian should be removed");
+        check(!forest.isProtected(4, 7), "The pulse should not keep the protection zone active");
+        check(!inside.isBurning() && inside.getHealth() == 70.0,
+                "The pulse should extinguish the nearby tree without healing it");
+        check(outside.isBurning(), "A fire outside the circular radius should keep burning");
+        check(forest.getGuardianPulses().equals(java.util.List.of(new Forest.GuardianPulse(4, 4))),
+                "The death should show one pulse at the Guardian's cell");
+
+        inside.ignite();
+        forest.update();
+        check(inside.isBurning() && forest.getGuardianPulses().isEmpty(),
+                "A dead Guardian should not pulse again or block reignition");
     }
 
     private static void testValidation() {

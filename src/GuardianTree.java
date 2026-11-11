@@ -5,4 +5,9 @@ public class GuardianTree extends Tree {
     public GuardianTree() {
         super(0.15, 450.0, 1.0);
     }
+
+    static boolean isWithinRadius(int rowOffset, int columnOffset) {
+        return rowOffset * rowOffset + columnOffset * columnOffset
+                <= PROTECTION_RADIUS * PROTECTION_RADIUS;
+    }
 }
