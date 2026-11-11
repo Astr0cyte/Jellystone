@@ -22,6 +22,10 @@ public class Main {
             source = new ZeusJudgment();
             System.out.println("Ignition source: Zeus' Heavenly Judgment");
 
+        } else if (args.length > 0 && "phoenix".equalsIgnoreCase(args[0])) {
+            source = new PhoenixRising();
+            System.out.println("Ignition source: Phoenix Rising");
+
         } else if (choice == 0) {
             lightning = new Lightning();
             source = lightning;
