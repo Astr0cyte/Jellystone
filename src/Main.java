@@ -18,19 +18,7 @@ public class Main {
 
         int choice = random.nextInt(3);
 
-        if (args.length > 0 && "zeus".equalsIgnoreCase(args[0])) {
-            source = new ZeusJudgment();
-            System.out.println("Ignition source: Zeus' Heavenly Judgment");
-
-        } else if (args.length > 0 && "phoenix".equalsIgnoreCase(args[0])) {
-            source = new PhoenixRising();
-            System.out.println("Ignition source: Phoenix Rising");
-
-        } else if (args.length > 0 && "serpent".equalsIgnoreCase(args[0])) {
-            source = new FireSerpent();
-            System.out.println("Ignition source: Fire Serpent");
-
-        } else if (choice == 0) {
+        if (choice == 0) {
             lightning = new Lightning();
             source = lightning;
             System.out.println("Ignition source: Lightning");
