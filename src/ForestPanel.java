@@ -9,6 +9,9 @@ public class ForestPanel extends JPanel {
     private Forest forest;
 
     private Image treeImage;
+    private Image guardianImage;
+    private static final Color PROTECTED_SOIL = new Color(171, 190, 131);
+    private static final int GUARDIAN_SPRITE_SCALE = 4;
     private final Map<FireColor, Image> fireImages = new EnumMap<>(FireColor.class);
 
     private Lightning lightning;
@@ -27,6 +30,7 @@ public class ForestPanel extends JPanel {
         System.out.println(new java.io.File("images/lightning.png").exists());
 
         treeImage = new ImageIcon("images/tree.png").getImage();
+        guardianImage = new ImageIcon("images/guardian-tree-gold.png").getImage();
         ImageIcon fireIcon = new ImageIcon("images/fire.png");
         fireImages.put(FireColor.ORANGE, fireIcon.getImage());
         fireImages.put(FireColor.BLUE, tintFire(fireIcon, new Color(0, 0, 128), new Color(127, 255, 255)));
@@ -89,6 +93,8 @@ public class ForestPanel extends JPanel {
                 lightningStartTime = System.currentTimeMillis();
             }
         }
+        boolean showLightning = currentLightningCell != null
+                && System.currentTimeMillis() - lightningStartTime < 3000;
 
         for (int row = 0; row < grid.length; row++) {
 
@@ -96,7 +102,7 @@ public class ForestPanel extends JPanel {
 
                 Cell cell = grid[row][col];
 
-                g.setColor(getBackground());
+                g.setColor(forest.isProtected(row, col) ? PROTECTED_SOIL : getBackground());
 
                 g.fillRect(
                     col * cellWidth,
@@ -105,10 +111,11 @@ public class ForestPanel extends JPanel {
                     cellHeight
                 );
 
-                if (lightning != null &&
-                    cell == currentLightningCell &&
-                    System.currentTimeMillis() - lightningStartTime < 3000) {
+                if (cell.getTree() instanceof GuardianTree) {
+                    continue;
+                }
 
+                if (showLightning && cell == currentLightningCell) {
                     g.drawImage(
                         lightningImage,
                         col * cellWidth + 2,
@@ -146,6 +153,34 @@ public class ForestPanel extends JPanel {
                             this
                         );
                     }
+                }
+            }
+        }
+
+        // Draw the larger sprites after the grid so neighbouring cells cannot clip them.
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                Cell cell = grid[row][col];
+                if (!(cell.getTree() instanceof GuardianTree guardian)) {
+                    continue;
+                }
+
+                int x = col * cellWidth;
+                int y = row * cellHeight;
+                int treeWidth = Math.max(1, cellWidth - 4);
+                int treeHeight = Math.max(1, cellHeight - 4);
+                int guardianWidth = treeWidth * GUARDIAN_SPRITE_SCALE;
+                int guardianHeight = treeHeight * GUARDIAN_SPRITE_SCALE;
+                g.drawImage(guardianImage,
+                        x + (cellWidth - guardianWidth) / 2,
+                        y + (cellHeight - guardianHeight) / 2,
+                        guardianWidth, guardianHeight, this);
+
+                if (showLightning && cell == currentLightningCell) {
+                    g.drawImage(lightningImage, x + 2, y + 2, treeWidth, treeHeight, this);
+                } else if (guardian.isBurning()) {
+                    g.drawImage(fireImages.get(guardian.getFireColor()),
+                            x + 2, y + 2, treeWidth, treeHeight, this);
                 }
             }
         }

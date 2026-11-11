@@ -12,6 +12,7 @@ public class Main {
 
 
         Random random = new Random();
+        plantGuardians(forest, random);
 
         IgnitionSource source;
         Lightning lightning = null;
@@ -72,5 +73,28 @@ public class Main {
         });
 
         timer.start();
+    }
+
+    static void plantGuardians(Forest forest, Random random) {
+        Cell[][] grid = forest.getGrid();
+        int middleRow = grid.length / 2;
+        int middleColumn = grid[0].length / 2;
+        int[] rowBounds = {0, middleRow, grid.length};
+        int[] columnBounds = {0, middleColumn, grid[0].length};
+
+        for (int verticalHalf = 0; verticalHalf < 2; verticalHalf++) {
+            for (int horizontalHalf = 0; horizontalHalf < 2; horizontalHalf++) {
+                int row = randomGuardianCoordinate(
+                        random, rowBounds[verticalHalf], rowBounds[verticalHalf + 1]);
+                int column = randomGuardianCoordinate(
+                        random, columnBounds[horizontalHalf], columnBounds[horizontalHalf + 1]);
+                grid[row][column].plantTree(new GuardianTree());
+            }
+        }
+    }
+
+    private static int randomGuardianCoordinate(Random random, int start, int end) {
+        int margin = Math.min(3, (end - start - 1) / 2);
+        return start + margin + random.nextInt(end - start - 2 * margin);
     }
 }
