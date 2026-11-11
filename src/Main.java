@@ -5,6 +5,10 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
+        if (args.length > 0 && "benchmark".equalsIgnoreCase(args[0])) {
+            SpreadBenchmark.run();
+            return;
+        }
         if (args.length > 0 && "replay".equalsIgnoreCase(args[0])) {
             FireReplay.run(args);
             return;

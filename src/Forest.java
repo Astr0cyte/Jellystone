@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Forest {
 
@@ -18,6 +19,7 @@ public class Forest {
 
     private final Random random;
     private final double[][][] replayRolls;
+    private final boolean parallelSpread;
     private final List<GuardianPulse> guardianPulses = new ArrayList<>();
     private final List<Cell> burntCells = new ArrayList<>();
 
@@ -28,15 +30,21 @@ public class Forest {
     }
 
     public Forest(int rows, int columns, boolean mixedSpecies) {
-        this(rows, columns, new Random(), false, mixedSpecies);
+        this(rows, columns, new Random(), false, mixedSpecies, false);
     }
 
     public Forest(int rows, int columns, long seed) {
-        this(rows, columns, new Random(seed), true, false);
+        this(rows, columns, seed, false);
     }
 
-    private Forest(int rows, int columns, Random random, boolean replay, boolean mixedSpecies) {
+    Forest(int rows, int columns, long seed, boolean parallelSpread) {
+        this(rows, columns, new Random(seed), true, false, parallelSpread);
+    }
+
+    private Forest(int rows, int columns, Random random, boolean replay, boolean mixedSpecies,
+            boolean parallelSpread) {
         this.random = random;
+        this.parallelSpread = parallelSpread;
         replayRolls = replay ? new double[rows][columns][9] : null;
 
         grid = new Cell[rows][columns];
@@ -223,10 +231,23 @@ public class Forest {
             }
         }
 
-        boolean[][] igniteNext =
-                new boolean[grid.length][grid[0].length];
+        if (parallelSpread) {
+            int middleRow = grid.length / 2;
+            // Each half writes to its own grid, even for fire crossing the boundary.
+            List<boolean[][]> plans = IntStream.range(0, 2).parallel()
+                    .mapToObj(half -> half == 0
+                            ? planIgnitions(0, middleRow)
+                            : planIgnitions(middleRow, grid.length))
+                    .toList();
+            applyIgnitions(plans.get(0), plans.get(1));
+        } else {
+            applyIgnitions(planIgnitions(0, grid.length), null);
+        }
+    }
 
-        for (int row = 0; row < grid.length; row++) {
+    private boolean[][] planIgnitions(int firstRow, int endRow) {
+        boolean[][] igniteNext = new boolean[grid.length][grid[0].length];
+        for (int row = firstRow; row < endRow; row++) {
 
             for (int col = 0; col < grid[row].length; col++) {
 
@@ -247,12 +268,16 @@ public class Forest {
             }
         }
 
-        // Ignite AFTER checking the entire grid
+        return igniteNext;
+    }
+
+    private void applyIgnitions(boolean[][] igniteNext, boolean[][] otherHalf) {
+        // Change trees only after both halves have finished planning.
         for (int row = 0; row < grid.length; row++) {
 
             for (int col = 0; col < grid[row].length; col++) {
 
-                if (igniteNext[row][col]) {
+                if (igniteNext[row][col] || (otherHalf != null && otherHalf[row][col])) {
                     grid[row][col].getTree().ignite();
                 }
             }

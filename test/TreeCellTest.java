@@ -13,6 +13,7 @@ public class TreeCellTest {
         testFireReplay();
         testAshBloom();
         testMixedSpecies();
+        testParallelSpreadMatchesSequential();
         testValidation();
 
         System.out.println("All Tree/Cell tests passed.");
@@ -299,6 +300,35 @@ public class TreeCellTest {
         row[0].getTree().kill();
         check(sample.countTreesBySpecies().equals(java.util.Map.of("OAK", 1L, "BIRCH", 1L)),
                 "Species counts should include only living trees");
+    }
+
+    private static void testParallelSpreadMatchesSequential() {
+        Forest sequential = SpreadBenchmark.createScenario(false);
+        Forest parallel = SpreadBenchmark.createScenario(true);
+        int ticks = 0;
+        while (sequential.hasBurningTrees()) {
+            sequential.update();
+            parallel.update();
+            ticks++;
+            check(sequential.getGuardianPulses().equals(parallel.getGuardianPulses()),
+                    "Guardian pulses should match at tick " + ticks);
+            Cell[][] expected = sequential.getGrid();
+            Cell[][] actual = parallel.getGrid();
+            for (int row = 0; row < expected.length; row++) {
+                for (int col = 0; col < expected[row].length; col++) {
+                    Tree first = expected[row][col].getTree();
+                    Tree second = actual[row][col].getTree();
+                    check((first == null) == (second == null), "Tree occupancy should match");
+                    if (first != null) {
+                        check(first.getHealth() == second.getHealth()
+                                        && first.isBurning() == second.isBurning()
+                                        && first.getFireColor() == second.getFireColor(),
+                                "Tree state should match at tick " + ticks);
+                    }
+                }
+            }
+        }
+        check(ticks > 0 && !parallel.hasBurningTrees(), "Both fires should finish on the same tick");
     }
 
     private static void testValidation() {
