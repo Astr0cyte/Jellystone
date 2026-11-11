@@ -12,6 +12,7 @@ public class IgnitionSourceTest {
         testRejectsInvalidSpreadability();
         testIgnitionSourcePolymorphism();
         testZeusIgnitesBlueBoltAndSpreadsOrange();
+        testPhoenixIgnitesColouredRing();
         
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -163,6 +164,37 @@ public class IgnitionSourceTest {
         Tree neighbour = grid[2][32].getTree();
         check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
                 "Fire spreading from a Zeus strike should be orange");
+    }
+
+    private static void testPhoenixIgnitesColouredRing() {
+        Forest forest = new Forest(40, 60);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.plantTree(new Tree(1.0));
+            }
+        }
+
+        grid[20][42].removeTree();
+        new PhoenixRising().ignite(forest);
+
+        check(!grid[20][42].hasTree(), "Phoenix should skip empty cells");
+        check(!grid[20][30].getTree().isBurning(), "The centre should start untouched");
+        check(!grid[20][44].getTree().isBurning(), "Trees outside the ring should start untouched");
+        check(grid[8][30].getTree().isBurning()
+                        && grid[8][30].getTree().getFireColor() == FireColor.PURPLE,
+                "The top of the ring should burn purple");
+        check(grid[20][41].getTree().isBurning()
+                        && grid[20][41].getTree().getFireColor() == FireColor.PURPLE,
+                "The right side of the ring should burn purple");
+        check(grid[32][30].getTree().isBurning()
+                        && grid[32][30].getTree().getFireColor() == FireColor.PURPLE,
+                "The bottom of the ring should burn purple");
+
+        forest.update();
+        Tree neighbour = grid[20][44].getTree();
+        check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
+                "Fire spreading beyond the ring should burn orange");
     }
 
     private static void checkIgnitesThroughBaseType(
