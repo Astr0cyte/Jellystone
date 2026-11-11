@@ -25,7 +25,7 @@ public class ForestPanel extends JPanel {
     public ForestPanel(Forest forest, Lightning lightning) {
         this.forest = forest;
         this.lightning = lightning;
-        setBackground(new Color(117, 76, 50));
+        setBackground(Color.BLACK);
 
         System.out.println(new java.io.File("images/tree.png").exists());
         System.out.println(new java.io.File("images/fire.png").exists());
@@ -34,18 +34,17 @@ public class ForestPanel extends JPanel {
         ImageIcon treeIcon = new ImageIcon("images/tree.png");
         treeImage = treeIcon.getImage();
         speciesImages = Map.of(
-                Oak.class, tintSprite(treeIcon, new Color(155, 99, 0), new Color(255, 249, 35), true),
-                Birch.class, tintSprite(treeIcon, new Color(63, 112, 0), new Color(188, 255, 37), true),
-                Eucalyptus.class, tintSprite(treeIcon, new Color(0, 100, 117), new Color(39, 255, 255), true),
-                Spruce.class, tintSprite(treeIcon, new Color(143, 0, 67), new Color(255, 81, 186), true));
+                Oak.class, tintSprite(treeIcon, new Color(112, 49, 20), new Color(0xB85A2B), true),
+                Birch.class, tintSprite(treeIcon, new Color(67, 102, 19), new Color(0xA7CF46), true),
+                Eucalyptus.class, tintSprite(treeIcon, new Color(44, 91, 84), new Color(0x78BDB5), true),
+                Spruce.class, tintSprite(treeIcon, new Color(16, 45, 30), new Color(0x24533B), true));
         seedlingImage = new ImageIcon("images/ash-bloom-seedling.png").getImage();
         guardianImage = new ImageIcon("images/guardian-tree-gold.png").getImage();
         ImageIcon fireIcon = new ImageIcon("images/fire.png");
         fireImages.put(FireColor.ORANGE, fireIcon.getImage());
         fireImages.put(FireColor.BLUE, tintFire(fireIcon, new Color(0, 0, 128), new Color(127, 255, 255)));
         fireImages.put(FireColor.PURPLE, tintFire(fireIcon, new Color(52, 0, 105), new Color(194, 138, 255)));
-        fireImages.put(FireColor.BLACK, tintFire(fireIcon, new Color(10, 10, 10), new Color(64, 64, 64)));
-        fireImages.put(FireColor.WHITE, tintFire(fireIcon, new Color(179, 179, 179), Color.WHITE));
+        fireImages.put(FireColor.MAGENTA, tintFire(fireIcon, new Color(145, 0, 103), new Color(255, 79, 236)));
         lightningImage = new ImageIcon("images/lightning.png").getImage();
     }
 
