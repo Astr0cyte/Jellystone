@@ -13,7 +13,7 @@ public class IgnitionSourceTest {
         testIgnitionSourcePolymorphism();
         testZeusIgnitesBlueBoltAndSpreadsOrange();
         testPhoenixIgnitesColouredRing();
-        testFireSerpentIgnitesBandedTrail();
+        testFireSerpentIgnitesMagentaSnake();
         
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -198,7 +198,7 @@ public class IgnitionSourceTest {
                 "Fire spreading beyond the ring should burn orange");
     }
 
-    private static void testFireSerpentIgnitesBandedTrail() {
+    private static void testFireSerpentIgnitesMagentaSnake() {
         Forest forest = new Forest(40, 60);
         Cell[][] grid = forest.getGrid();
         for (Cell[] row : grid) {
@@ -207,20 +207,27 @@ public class IgnitionSourceTest {
             }
         }
 
-        grid[20][5].removeTree();
+        grid[29][10].removeTree();
         new FireSerpent().ignite(forest);
 
-        check(!grid[20][5].hasTree(), "Fire Serpent should skip empty cells");
-        Tree firstBend = grid[30][17].getTree();
-        Tree secondBend = grid[9][40].getTree();
-        Tree nextBand = grid[9][41].getTree();
-        check(firstBend.isBurning() && firstBend.getFireColor() == FireColor.BLACK,
-                "The first bend should curve downward and include a black band");
-        check(secondBend.isBurning() && secondBend.getFireColor() == FireColor.WHITE,
-                "The second bend should curve upward and include a white band");
-        check(nextBand.isBurning() && nextBand.getFireColor() == FireColor.BLACK,
-                "The next band should switch back to black");
-        Tree neighbour = grid[22][5].getTree();
+        check(!grid[29][10].hasTree(), "Fire Serpent should skip empty cells");
+        check(grid[28][11].getTree().isBurning() && grid[10][20].getTree().isBurning()
+                        && grid[29][34].getTree().isBurning() && grid[11][44].getTree().isBurning(),
+                "The body should have multiple bends");
+        check(grid[20][5].getTree().isBurning() && !grid[21][5].getTree().isBurning(),
+                "The tail should start one cell wide");
+        check(grid[16][51].getTree().isBurning() && grid[22][51].getTree().isBurning()
+                        && grid[19][55].getTree().isBurning(),
+                "The head should be wider than the body and extend past it");
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                if (cell.hasTree() && cell.getTree().isBurning()) {
+                    check(cell.getTree().getFireColor() == FireColor.MAGENTA,
+                            "The whole serpent should burn magenta");
+                }
+            }
+        }
+        Tree neighbour = grid[19][5].getTree();
         check(!neighbour.isBurning(), "Trees outside the trail should start untouched");
 
         forest.update();
