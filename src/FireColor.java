@@ -1,5 +1,7 @@
 public enum FireColor {
     ORANGE,
     BLUE,
-    PURPLE
+    PURPLE,
+    BLACK,
+    WHITE
 }
