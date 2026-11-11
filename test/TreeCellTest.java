@@ -10,6 +10,7 @@ public class TreeCellTest {
         testCellRemoval();
         testGuardianProtection();
         testGuardianLastStand();
+        testFireReplay();
         testValidation();
 
         System.out.println("All Tree/Cell tests passed.");
@@ -227,6 +228,17 @@ public class TreeCellTest {
         forest.update();
         check(inside.isBurning() && forest.getGuardianPulses().isEmpty(),
                 "A dead Guardian should not pulse again or block reignition");
+    }
+
+    private static void testFireReplay() {
+        FireReplay.Comparison first = FireReplay.compare(42);
+        FireReplay.Comparison second = FireReplay.compare(42);
+        check(first.equals(second), "The same seed should reproduce both results");
+        check(first.withGuardians().ticks() > 0 && first.withoutGuardians().ticks() > 0,
+                "Phoenix should ignite both replay runs");
+        check(first.withGuardians().total() <= first.startingTrees()
+                        && first.withoutGuardians().total() <= first.startingTrees(),
+                "Survivors should never exceed the starting tree count");
     }
 
     private static void testValidation() {
