@@ -11,6 +11,9 @@ public class IgnitionSourceTest {
         testRejectsInvalidSeverity();
         testRejectsInvalidSpreadability();
         testIgnitionSourcePolymorphism();
+        testZeusIgnitesBlueBoltAndSpreadsOrange();
+        testPhoenixIgnitesColouredRing();
+        testFireSerpentIgnitesBandedTrail();
         
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -116,26 +119,129 @@ public class IgnitionSourceTest {
         }
     }
 
-private static void testIgnitionSourcePolymorphism() {
-    IgnitionSource[] sources = {
-            new Arson(0, 0),
-            new Lightning(),
-            new Backburning(0)
-    };
+    private static void testIgnitionSourcePolymorphism() {
+        checkIgnitesThroughBaseType(new Arson(0, 0), 0);
+        checkIgnitesThroughBaseType(new Lightning(), 0);
+        checkIgnitesThroughBaseType(new Backburning(0), 2);
+    }
 
-    for (IgnitionSource source : sources) {
-        Forest forest = new Forest(1, 1);
-        forest.getGrid()[0][0].plantTree(new Tree(0.9));
+    private static void testZeusIgnitesBlueBoltAndSpreadsOrange() {
+        Forest forest = new Forest(40, 60);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.plantTree(new Tree(1.0));
+            }
+        }
+
+        grid[14][32].removeTree();
+        new ZeusJudgment().ignite(forest);
+
+        check(!grid[14][32].hasTree(), "Zeus should skip the gap in the bolt");
+        int blueStrikes = 0;
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                Cell cell = grid[row][col];
+                if (!cell.hasTree()) {
+                    continue;
+                }
+                Tree tree = cell.getTree();
+                if (tree.isBurning()) {
+                    check(tree.getFireColor() == FireColor.BLUE, "Direct Zeus strikes should be blue");
+                    blueStrikes++;
+                }
+            }
+        }
+        check(blueStrikes > 150, "The filled bolt should ignite many cells");
+        check(grid[14][24].getTree().isBurning() && grid[14][39].getTree().isBurning(),
+                "The bend should span multiple columns");
+        check(grid[33][24].getTree().isBurning() && !grid[33][25].getTree().isBurning(),
+                "The bolt should taper to a narrow tip");
+        check(!grid[2][32].getTree().isBurning(), "A cell outside the bolt should stay unlit");
+
+        forest.update();
+        check(grid[2][33].getTree().getFireColor() == FireColor.BLUE,
+                "The original strike should stay blue while burning");
+        Tree neighbour = grid[2][32].getTree();
+        check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
+                "Fire spreading from a Zeus strike should be orange");
+    }
+
+    private static void testPhoenixIgnitesColouredRing() {
+        Forest forest = new Forest(40, 60);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.plantTree(new Tree(1.0));
+            }
+        }
+
+        grid[20][42].removeTree();
+        new PhoenixRising().ignite(forest);
+
+        check(!grid[20][42].hasTree(), "Phoenix should skip empty cells");
+        check(!grid[20][30].getTree().isBurning(), "The centre should start untouched");
+        check(!grid[20][44].getTree().isBurning(), "Trees outside the ring should start untouched");
+        check(grid[8][30].getTree().isBurning()
+                        && grid[8][30].getTree().getFireColor() == FireColor.PURPLE,
+                "The top of the ring should burn purple");
+        check(grid[20][41].getTree().isBurning()
+                        && grid[20][41].getTree().getFireColor() == FireColor.PURPLE,
+                "The right side of the ring should burn purple");
+        check(grid[32][30].getTree().isBurning()
+                        && grid[32][30].getTree().getFireColor() == FireColor.PURPLE,
+                "The bottom of the ring should burn purple");
+
+        forest.update();
+        Tree neighbour = grid[20][44].getTree();
+        check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
+                "Fire spreading beyond the ring should burn orange");
+    }
+
+    private static void testFireSerpentIgnitesBandedTrail() {
+        Forest forest = new Forest(40, 60);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.plantTree(new Tree(1.0));
+            }
+        }
+
+        grid[20][5].removeTree();
+        new FireSerpent().ignite(forest);
+
+        check(!grid[20][5].hasTree(), "Fire Serpent should skip empty cells");
+        Tree firstBend = grid[30][17].getTree();
+        Tree secondBend = grid[9][40].getTree();
+        Tree nextBand = grid[9][41].getTree();
+        check(firstBend.isBurning() && firstBend.getFireColor() == FireColor.BLACK,
+                "The first bend should curve downward and include a black band");
+        check(secondBend.isBurning() && secondBend.getFireColor() == FireColor.WHITE,
+                "The second bend should curve upward and include a white band");
+        check(nextBand.isBurning() && nextBand.getFireColor() == FireColor.BLACK,
+                "The next band should switch back to black");
+        Tree neighbour = grid[22][5].getTree();
+        check(!neighbour.isBurning(), "Trees outside the trail should start untouched");
+
+        forest.update();
+        check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
+                "Fire spreading from the trail should burn orange");
+    }
+
+    private static void checkIgnitesThroughBaseType(
+            IgnitionSource source, int expectedColumn) {
+        Forest forest = new Forest(1, expectedColumn + 1);
+        Cell target = forest.getGrid()[0][expectedColumn];
+        target.plantTree(new Tree(0.9));
 
         source.ignite(forest);
 
         check(
-                forest.getGrid()[0][0].getTree().isBurning(),
+                target.getTree().isBurning(),
                 source.getClass().getSimpleName()
                         + " should ignite through an IgnitionSource reference"
         );
     }
-}
 
 private static void testRejectsInvalidSeverity() {
     boolean exceptionThrown = false;
