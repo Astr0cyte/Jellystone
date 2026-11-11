@@ -12,12 +12,23 @@ public class Forest {
 
     private Wind wind;
 
-    private Random random = new Random();
+    private final Random random;
+    private final double[][][] replayRolls;
     private final List<GuardianPulse> guardianPulses = new ArrayList<>();
 
     public record GuardianPulse(int row, int column) {}
 
     public Forest(int rows, int columns) {
+        this(rows, columns, new Random(), false);
+    }
+
+    public Forest(int rows, int columns, long seed) {
+        this(rows, columns, new Random(seed), true);
+    }
+
+    private Forest(int rows, int columns, Random random, boolean replay) {
+        this.random = random;
+        replayRolls = replay ? new double[rows][columns][9] : null;
 
         grid = new Cell[rows][columns];
 
@@ -134,6 +145,16 @@ public class Forest {
 
     
     private void spreadFire() {
+        if (replayRolls != null) {
+            // Reserve a draw for each direction so both replays use matching rolls.
+            for (double[][] row : replayRolls) {
+                for (double[] cellRolls : row) {
+                    for (int direction = 0; direction < cellRolls.length; direction++) {
+                        cellRolls[direction] = random.nextDouble();
+                    }
+                }
+            }
+        }
 
         boolean[][] igniteNext =
                 new boolean[grid.length][grid[0].length];
@@ -218,9 +239,17 @@ public class Forest {
         chance = Math.max(0.0, Math.min(1.0, chance));
         chance = applyGuardianProtection(chance, row, col);
 
-        if (random.nextDouble() < chance) {
+        if (spreadRoll(sourceRow, sourceCol, row, col) < chance) {
             igniteNext[row][col] = true;
         }
+    }
+
+    private double spreadRoll(int sourceRow, int sourceCol, int row, int col) {
+        if (replayRolls == null) {
+            return random.nextDouble();
+        }
+        int direction = (row - sourceRow + 1) * 3 + col - sourceCol + 1;
+        return replayRolls[sourceRow][sourceCol][direction];
     }
 
     public void display() {
