@@ -44,6 +44,27 @@ public class Forest {
         return grid;
     }
 
+    public boolean isProtected(int row, int column) {
+        int radius = GuardianTree.PROTECTION_RADIUS;
+        for (int r = Math.max(0, row - radius); r <= Math.min(grid.length - 1, row + radius); r++) {
+            for (int c = Math.max(0, column - radius); c <= Math.min(grid[r].length - 1, column + radius); c++) {
+                int dy = r - row;
+                int dx = c - column;
+                if ((dx != 0 || dy != 0) && dx * dx + dy * dy <= radius * radius
+                        && grid[r][c].getTree() instanceof GuardianTree guardian && guardian.isAlive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    double applyGuardianProtection(double chance, int row, int column) {
+        return isProtected(row, column)
+                ? chance * GuardianTree.PROTECTED_SPREAD_MULTIPLIER
+                : chance;
+    }
+
     public void setWind(Wind wind) {
         this.wind = wind;
         wind.applyWind(this);
@@ -167,6 +188,7 @@ public class Forest {
         chance -= rainfall * 0.2;
 
         chance = Math.max(0.0, Math.min(1.0, chance));
+        chance = applyGuardianProtection(chance, row, col);
 
         if (random.nextDouble() < chance) {
             igniteNext[row][col] = true;
