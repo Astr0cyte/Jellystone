@@ -1,6 +1,7 @@
 public class Tree implements Burnable {
 
     private boolean burning;
+    private FireColor fireColor = FireColor.ORANGE;
     private double spreadability;
     private double burnIntensity;
     private boolean alive;
@@ -42,8 +43,13 @@ public class Tree implements Burnable {
 
     // OVERLOADED version
     public void ignite(double severity) {
+        ignite(severity, FireColor.ORANGE);
+    }
+
+    public void ignite(double severity, FireColor color) {
         if (alive && severity >= 0.5) {
             burning = true;
+            fireColor = color;
             burnIntensity = Math.max(
                     burnIntensity,
                     severity * burnIntensityFactor
@@ -93,15 +99,21 @@ public class Tree implements Burnable {
         return burnIntensity;
     }
 
+    public FireColor getFireColor() {
+        return fireColor;
+    }
+
     public void extinguish() {
         burning = false;
         burnIntensity = 0.0;
+        fireColor = FireColor.ORANGE;
     }
 
     public void kill() {
         alive = false;
         burning = false;
         burnIntensity = 0.0;
+        fireColor = FireColor.ORANGE;
     }
 
     public void advanceBurning() {
