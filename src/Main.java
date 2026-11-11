@@ -18,7 +18,11 @@ public class Main {
 
         int choice = random.nextInt(3);
 
-        if (choice == 0) {
+        if (args.length > 0 && "zeus".equalsIgnoreCase(args[0])) {
+            source = new ZeusJudgment();
+            System.out.println("Ignition source: Zeus' Heavenly Judgment");
+
+        } else if (choice == 0) {
             lightning = new Lightning();
             source = lightning;
             System.out.println("Ignition source: Lightning");

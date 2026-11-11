@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class ForestPanel extends JPanel {
@@ -7,6 +8,7 @@ public class ForestPanel extends JPanel {
 
     private Image treeImage;
     private Image fireImage;
+    private Image blueFireImage;
 
     private Lightning lightning;
     private Image lightningImage;
@@ -23,8 +25,36 @@ public class ForestPanel extends JPanel {
         System.out.println(new java.io.File("images/lightning.png").exists());
 
         treeImage = new ImageIcon("images/tree.png").getImage();
-        fireImage = new ImageIcon("images/fire.png").getImage();
+        ImageIcon fireIcon = new ImageIcon("images/fire.png");
+        fireImage = fireIcon.getImage();
+        blueFireImage = createBlueFireImage(fireIcon);
         lightningImage = new ImageIcon("images/lightning.png").getImage();
+    }
+
+    private Image createBlueFireImage(ImageIcon fireIcon) {
+        if (fireIcon.getIconWidth() <= 0 || fireIcon.getIconHeight() <= 0) {
+            return fireIcon.getImage();
+        }
+
+        BufferedImage image = new BufferedImage(
+                fireIcon.getIconWidth(), fireIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(fireIcon.getImage(), 0, 0, null);
+        graphics.dispose();
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int pixel = image.getRGB(x, y);
+                int alpha = pixel >>> 24;
+                int red = (pixel >>> 16) & 255;
+                int green = (pixel >>> 8) & 255;
+                int blue = pixel & 255;
+                int brightness = (3 * red + 6 * green + blue) / 10;
+                Color tint = new Color(brightness / 2, brightness, 128 + brightness / 2, alpha);
+                image.setRGB(x, y, tint.getRGB());
+            }
+        }
+        return image;
     }
 
     @Override
@@ -84,7 +114,7 @@ public class ForestPanel extends JPanel {
                     else if (cell.getTree().isBurning()) {
 
                         g.drawImage(
-                            fireImage,
+                            cell.getTree().getFireColor() == FireColor.BLUE ? blueFireImage : fireImage,
                             col * cellWidth + 2,
                             row * cellHeight + 2,
                             cellWidth - 4,

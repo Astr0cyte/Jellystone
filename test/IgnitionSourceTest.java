@@ -11,6 +11,7 @@ public class IgnitionSourceTest {
         testRejectsInvalidSeverity();
         testRejectsInvalidSpreadability();
         testIgnitionSourcePolymorphism();
+        testZeusIgnitesBlueBoltAndSpreadsOrange();
         
         System.out.println("All IgnitionSource tests passed.");
     }
@@ -120,6 +121,48 @@ public class IgnitionSourceTest {
         checkIgnitesThroughBaseType(new Arson(0, 0), 0);
         checkIgnitesThroughBaseType(new Lightning(), 0);
         checkIgnitesThroughBaseType(new Backburning(0), 2);
+    }
+
+    private static void testZeusIgnitesBlueBoltAndSpreadsOrange() {
+        Forest forest = new Forest(40, 60);
+        Cell[][] grid = forest.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                cell.plantTree(new Tree(1.0));
+            }
+        }
+
+        grid[14][32].removeTree();
+        new ZeusJudgment().ignite(forest);
+
+        check(!grid[14][32].hasTree(), "Zeus should skip the gap in the bolt");
+        int blueStrikes = 0;
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                Cell cell = grid[row][col];
+                if (!cell.hasTree()) {
+                    continue;
+                }
+                Tree tree = cell.getTree();
+                if (tree.isBurning()) {
+                    check(tree.getFireColor() == FireColor.BLUE, "Direct Zeus strikes should be blue");
+                    blueStrikes++;
+                }
+            }
+        }
+        check(blueStrikes > 150, "The filled bolt should ignite many cells");
+        check(grid[14][24].getTree().isBurning() && grid[14][39].getTree().isBurning(),
+                "The bend should span multiple columns");
+        check(grid[33][24].getTree().isBurning() && !grid[33][25].getTree().isBurning(),
+                "The bolt should taper to a narrow tip");
+        check(!grid[2][32].getTree().isBurning(), "A cell outside the bolt should stay unlit");
+
+        forest.update();
+        check(grid[2][33].getTree().getFireColor() == FireColor.BLUE,
+                "The original strike should stay blue while burning");
+        Tree neighbour = grid[2][32].getTree();
+        check(neighbour.isBurning() && neighbour.getFireColor() == FireColor.ORANGE,
+                "Fire spreading from a Zeus strike should be orange");
     }
 
     private static void checkIgnitesThroughBaseType(
