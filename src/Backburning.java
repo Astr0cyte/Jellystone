@@ -1,3 +1,5 @@
+import java.util.stream.IntStream;
+
 public class Backburning extends IgnitionSource {
 
     private static final double WAVELENGTH = 3.0;
@@ -24,23 +26,13 @@ public class Backburning extends IgnitionSource {
 
         double frequency = 2 * Math.PI / WAVELENGTH;
 
-        for (int col = 0;
-             col < grid[row].length;
-             col++) {
-
-            Cell cell = grid[row][col];
-
-            if (cell.hasTree()) {
-
-                double wave = (Math.sin(col * frequency) + 1) / 2;
-
-                // Only the troughs of the wave catch immediately - the
-                // rest of the line fills in as fire spreads from there.
-                if (wave < spreadability) {
-                    cell.getTree().ignite(severity);
-                }
-            }
-        }
+        Cell[] selectedRow = grid[row];
+        // Only trees in the troughs catch immediately.
+        IntStream.range(0, selectedRow.length)
+                .filter(col -> selectedRow[col].hasTree())
+                .filter(col -> (Math.sin(col * frequency) + 1) / 2 < spreadability)
+                .mapToObj(col -> selectedRow[col].getTree())
+                .forEachOrdered(tree -> tree.ignite(severity));
     }
 }
 
